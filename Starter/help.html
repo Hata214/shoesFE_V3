@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Help Center - SneakerVault</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+		
+		body {
+			font-family: 'Poppins', sans-serif;
+		}
+
+		.gradient-text {
+			background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+
+		.faq-item {
+			transition: all 0.3s ease;
+		}
+
+		.faq-answer {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 0.3s ease;
+		}
+
+		.faq-item.active .faq-answer {
+			max-height: 500px;
+		}
+
+		.faq-item.active .faq-icon {
+			transform: rotate(180deg);
+		}
+	</style>
+</head>
+<body class="bg-gray-50">
+	<!-- Copy the navbar from index.html -->
+	<nav>
+		<!-- Paste navbar content from index.html here -->
+	</nav>
+
+	<!-- Main Content -->
+	<main class="">
+		<!-- Hero Section -->
+		<div class="max-w-7xl mx-auto px-4 mb-8 pt-32">
+			<nav class="flex text-gray-500 text-sm">
+				<a href="index.html" class="hover:text-black">Home</a>
+				<span class="mx-2">/</span>
+				<span class="text-black">Help</span>
+			</nav>
+		</div>
+		<section class="bg-gradient-to-r from-gray-900 to-black text-white py-20">
+			<div class="max-w-7xl mx-auto px-4">
+				<div class="text-center">
+					<h1 class="text-5xl font-bold mb-6">How Can We Help?</h1>
+					<div class="max-w-2xl mx-auto">
+						<div class="relative">
+							<input type="text" 
+								   placeholder="Search for help articles..." 
+								   class="w-full px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+							<button class="absolute right-4 top-1/2 transform -translate-y-1/2">
+								<i class="fas fa-search text-gray-400"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Quick Links -->
+		<section class="py-16">
+			<div class="max-w-7xl mx-auto px-4">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+						<div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mb-6">
+							<i class="fas fa-truck text-black text-2xl"></i>
+						</div>
+						<h3 class="font-bold text-xl mb-4">Shipping & Delivery</h3>
+						<p class="text-gray-600 mb-4">Track your order and learn about our shipping policies</p>
+						<a href="#" class="text-black font-medium hover:underline">Learn More →</a>
+					</div>
+					<div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+						<div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mb-6">
+							<i class="fas fa-exchange-alt text-black text-2xl"></i>
+						</div>
+						<h3 class="font-bold text-xl mb-4">Returns & Exchanges</h3>
+						<p class="text-gray-600 mb-4">Easy returns within 30 days of purchase</p>
+						<a href="#" class="text-black font-medium hover:underline">Learn More →</a>
+					</div>
+					<div class="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+						<div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mb-6">
+							<i class="fas fa-credit-card text-black text-2xl"></i>
+						</div>
+						<h3 class="font-bold text-xl mb-4">Payment & Pricing</h3>
+						<p class="text-gray-600 mb-4">Information about payment methods and pricing</p>
+						<a href="#" class="text-black font-medium hover:underline">Learn More →</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- FAQ Section -->
+		<section class="bg-white py-16">
+			<div class="max-w-7xl mx-auto px-4">
+				<h2 class="text-4xl font-bold text-center mb-16">Frequently Asked Questions</h2>
+				<div class="max-w-3xl mx-auto space-y-4">
+					<!-- FAQ Item -->
+					<div class="faq-item bg-gray-50 rounded-xl">
+						<button class="w-full px-6 py-4 flex justify-between items-center">
+							<span class="font-semibold text-left">How long does shipping take?</span>
+							<i class="fas fa-chevron-down faq-icon transition-transform"></i>
+						</button>
+						<div class="faq-answer px-6 pb-4">
+							<p class="text-gray-600">Standard shipping typically takes 3-5 business days within the continental US. Express shipping options are available at checkout.</p>
+						</div>
+					</div>
+					<!-- Add more FAQ items as needed -->
+				</div>
+			</div>
+		</section>
+
+		<!-- Contact Section -->
+		<section class="py-16">
+			<div class="max-w-7xl mx-auto px-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+					<div>
+						<h2 class="text-4xl font-bold mb-6">Still Need Help?</h2>
+						<p class="text-gray-600 mb-8">
+							Our customer service team is here to help. Fill out the form and we'll get back to you as soon as possible.
+						</p>
+						<div class="space-y-6">
+							<div class="flex items-center gap-4">
+								<div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+									<i class="fas fa-phone text-black"></i>
+								</div>
+								<div>
+									<p class="font-semibold">Call Us</p>
+									<p class="text-gray-600">+1 (555) 123-4567</p>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+									<i class="fas fa-envelope text-black"></i>
+								</div>
+								<div>
+									<p class="font-semibold">Email Us</p>
+									<p class="text-gray-600">support@sneakervault.com</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div>
+						<form class="space-y-6">
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+								<input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+								<input type="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+								<textarea rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"></textarea>
+							</div>
+							<button class="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors">
+								Send Message
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- Copy the footer from index.html -->
+	<footer>
+		<!-- Paste footer content from index.html here -->
+	</footer>
+
+	<script>
+		// FAQ Toggle functionality
+		document.querySelectorAll('.faq-item').forEach(item => {
+			item.querySelector('button').addEventListener('click', () => {
+				item.classList.toggle('active');
+			});
+		});
+
+		// Animation for content sections
+		gsap.from(".fade-in", {
+			opacity: 0,
+			y: 30,
+			duration: 1,
+			stagger: 0.2,
+			scrollTrigger: {
+				trigger: ".fade-in",
+				start: "top 80%"
+			}
+		});
+	</script>
+
+	
+</body>
+</html>

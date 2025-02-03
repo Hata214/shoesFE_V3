@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SneakerVault - Premium Shoe Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Add custom styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .shoe-rotate {
+            transition: transform 0.5s ease;
+        }
+        
+        .shoe-rotate:hover {
+            transform: rotate(-10deg) scale(1.05);
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .main-product-image {
+        opacity: 1;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-product-image.fade-out {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .main-product-image.fade-in {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .thumbnail-container {
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100px; /* Fixed width */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        z-index: 10;
+    }
+
+    .product-thumbnail {
+        width: 100px;
+        height: 100px;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        border-radius: 1rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .product-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .product-thumbnail.active {
+        border-color: #FCD34D;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+    
+    .floating-delay {
+        animation: floating 3s ease-in-out 1.5s infinite;
+    }
+    
+    @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .text-glow {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .hero-shine {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-shine::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to bottom right,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.1) 50%,
+            rgba(255,255,255,0) 100%
+        );
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) rotate(45deg); }
+    }
+
+    .product-feature {
+        transition: all 0.3s ease;
+    }
+
+    .product-feature:hover {
+        transform: translateX(10px);
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Add to your existing styles */
+@keyframes slideDown {
+    0% { transform: translateY(-10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.group:hover .group-hover\:block {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Smooth rotation for dropdown icons */
+.transition-transform {
+    transition: transform 0.2s ease-out;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.group:hover .group-hover\:block {
+        display: block;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Announcement Bar -->
+    <!-- <div class="bg-black text-white py-2 text-center text-sm">
+        <p>Free Shipping on Orders Over $150 | Use Code: FREESHIP</p>
+    </div> -->
+
+    <!-- Navbar - Updated with modern design -->
+    <!-- Update the nav section with enhanced features -->
+<nav class="bg-white shadow-lg w-full fixed top-0 z-[100]">
+    <!-- Announcement Bar moved inside nav -->
+    <div class="bg-black text-white py-2 text-center text-sm">
+        <p>Free Shipping on Orders Over $150 | Use Code: FREESHIP</p>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-20">
+            <!-- Mobile menu button -->
+            <button class="md:hidden text-gray-700 hover:text-black">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+                <a href="#" class="text-3xl font-bold gradient-text mr-4">SneakerVault</a>
+            </div>
+            
+            <!-- Enhanced Categories Menu with Mega Menu -->
+            <div class="hidden md:flex space-x-8 relative group z-[110]">
+                <div class="flex items-center space-x-8">
+                    <div class="relative group">
+                        <a href="#" class="text-gray-700 hover:text-black font-medium flex items-center">
+                            New Arrivals
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </a>
+                        <!-- Mega Menu -->
+                        <div class="absolute top-full left-0 bg-white shadow-xl rounded-lg p-6 hidden group-hover:block w-[500px] grid grid-cols-2 gap-4 z-[120]">
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-3">Featured</h4>
+                                <ul class="space-y-2">
+                                    <li><a href="#" class="text-gray-600 hover:text-black">New Releases</a></li>
+                                    <li><a href="#" class="text-gray-600 hover:text-black">Best Sellers</a></li>
+                                    <li><a href="#" class="text-gray-600 hover:text-black">Limited Edition</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-3">Collections</h4>
+                                <ul class="space-y-2">
+                                    <li><a href="#" class="text-gray-600 hover:text-black">Summer 2023</a></li>
+                                    <li><a href="#" class="text-gray-600 hover:text-black">Sport Elite</a></li>
+                                    <li><a href="#" class="text-gray-600 hover:text-black">Classics</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                </a>
+                </a>
+                </a>
+                    <a href="shop.html" class="text-gray-700 hover:text-black font-medium">Shop</a>
+                    <a href="about.html" class="text-gray-700 hover:text-black font-medium">About Us</a>
+                    <a href="help.html" class="text-gray-700 hover:text-black font-medium">Help</a>
+                </div>
+            </div>
+
+            <!-- Enhanced Search Bar with Suggestions -->
+            <div class="flex-1 max-w-lg mx-4">
+                <div class="relative">
+                    <form action="search-results.html" method="GET" class="w-full">
+                        <input type="text" name="q" 
+                               class="w-full px-4 py-2 rounded-full border-2 border-gray-200 focus:outline-none focus:border-black transition-colors" 
+                               placeholder="Search for shoes...">
+                        <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-black transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    <!-- Search Suggestions -->
+                    <div class="absolute w-full bg-white mt-2 rounded-lg shadow-lg hidden group-focus-within:block">
+                        <div class="p-4">
+                            <h4 class="text-sm font-semibold text-gray-500 mb-2">Popular Searches</h4>
+                            <div class="space-y-2">
+                                <a href="search-results.html?q=Nike+Air+Max" class="block text-gray-700 hover:bg-gray-100 p-2 rounded">Nike Air Max</a>
+                                <a href="search-results.html?q=Running+Shoes" class="block text-gray-700 hover:bg-gray-100 p-2 rounded">Running Shoes</a>
+                                <a href="search-results.html?q=Basketball" class="block text-gray-700 hover:bg-gray-100 p-2 rounded">Basketball</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Right Menu -->
+            <div class="flex items-center space-x-6">
+                <!-- Currency Selector with Flags -->
+                <div class="relative group z-[110]">
+                    <button class="flex items-center space-x-1 text-gray-700 hover:text-black">
+                        <img src="https://flagcdn.com/w20/us.png" alt="USD" class="w-5 h-4">
+                        <span>USD</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block z-[120]">
+                        <div class="p-2">
+                            <a href="#" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                                <img src="https://flagcdn.com/w20/eu.png" alt="EUR" class="w-5 h-4">
+                                <span>EUR</span>
+                            </a>
+                            <a href="#" class="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
+                                <img src="https://flagcdn.com/w20/gb.png" alt="GBP" class="w-5 h-4">
+                                <span>GBP</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="text-gray-700 hover:text-black transition-colors">
+                        <i class="fas fa-user text-xl"></i>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+                        <!-- Guest View (Show when not logged in) -->
+                        <div class="p-4 guest-view">
+                            <a href="auth.html" class="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-sign-in-alt w-5"></i>
+                                <span>Sign Up/Sign In</span>
+                            </a>
+                            <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-user-plus w-5"></i>
+                                <span>Profile</span>
+                            </a>
+                        </div>
+                        <!-- Logged In View (Show when logged in) -->
+                        <div class="p-4 hidden logged-in-view">
+                            <a href="profile.html" class="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-user-circle mr-2"></i> My Profile
+                            </a>
+                            <a href="orders.html" class="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-box mr-2"></i> My Orders
+                            </a>
+                            <a href="settings.html" class="flex items-center gap-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <hr class="my-2">
+                            <button onclick="logout()" class="flex items-center gap-3 w-full text-left text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <a href="wishlist.html" class="text-gray-700 hover:text-black transition-colors relative">
+                    <i class="fas fa-heart text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
+                </a>
+                <a href="cart.html" class="text-gray-700 hover:text-black transition-colors relative">
+                    <i class="fas fa-shopping-bag text-xl"></i>
+                    <span class="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 mb-8 pt-32">
+    <nav class="flex text-gray-500 text-sm">
+        <span class="text-black">Home</span>
+    </nav>
+</div>
+
+    <!-- Main Content Area -->
+    <main class="">
+        <!-- Hero Section -->
+       <!-- Hero Section -->
+<div class="relative bg-gradient-to-r from-gray-900 via-black to-gray-900 min-h-[800px] flex items-center overflow-hidden">
+    <!-- Animated background pattern -->
+    <div class="absolute inset-0 opacity-20">
+        <div class="absolute inset-0 bg-repeat bg-center hero-pattern"></div>
+    </div>
+    
+    <!-- Animated gradient overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/40"></div>
+    
+    <!-- Moving particles effect -->
+    <div class="absolute inset-0" id="particles-js"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Content -->
+            <div class="text-white space-y-8">
+                <div class="space-y-4">
+                    <span class="inline-block text-yellow-400 text-lg font-medium bg-yellow-400/10 px-4 py-2 rounded-full">
+                        New Season Arrived
+                    </span>
+                    <h1 class="text-7xl font-bold leading-tight">
+                        <span class="block text-glow">Elevate Your</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 animate-gradient">Style Game</span>
+                    </h1>
+                    <p class="text-xl text-gray-300 leading-relaxed">
+                        Discover our latest collection of premium sneakers that combine 
+                        <span class="text-yellow-400">style</span>, 
+                        <span class="text-blue-400">comfort</span>, and 
+                        <span class="text-green-400">performance</span>.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4">
+                    <button class="group relative hero-shine bg-white hover:bg-yellow-400 text-black px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 hover:shadow-xl">
+                        Shop Collection
+                        <span class="absolute -right-2 -top-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">New</span>
+                    </button>
+                    <button class="relative overflow-hidden border-2 border-white hover:bg-white hover:text-black text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105">
+                        <span class="relative z-10">Watch Video</span>
+                        <i class="fas fa-play ml-2"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-8 pt-8">
+                    <div class="text-center">
+                        <h4 class="text-4xl font-bold text-glow">50+</h4>
+                        <p class="text-gray-400">Premium Brands</p>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-4xl font-bold text-glow">200+</h4>
+                        <p class="text-gray-400">Retail Shops</p>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-4xl font-bold text-glow">30k+</h4>
+                        <p class="text-gray-400">Happy Customers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="relative hidden lg:block">
+                <!-- Glowing effects -->
+                <div class="absolute -top-20 -left-20 w-40 h-40 bg-yellow-400 rounded-full filter blur-[100px] opacity-50 floating"></div>
+                <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-600 rounded-full filter blur-[100px] opacity-50 floating-delay"></div>
+                
+                <!-- Main product image -->
+                <div class="relative">
+                    <img id="mainProductImage" 
+                         src="https://www.pngall.com/wp-content/uploads/13/Nike-Shoes-PNG-Pic.png" 
+                         alt="Featured Shoe" 
+                         class="w-full max-w-2xl mx-auto transform transition-all duration-700 floating">
+                    
+                    <!-- Product Features -->
+                    <div class="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 space-y-4">
+                        <div class="product-feature bg-white/10 backdrop-blur-md rounded-xl p-4 cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-feather text-black"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold">Ultra Light</h4>
+                                    <p class="text-gray-300 text-sm">Feather-light design</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-feature bg-white/10 backdrop-blur-md rounded-xl p-4 cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-wind text-black"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold">Breathable</h4>
+                                    <p class="text-gray-300 text-sm">Advanced airflow</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-feature bg-white/10 backdrop-blur-md rounded-xl p-4 cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shoe-prints text-black"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold">Perfect Fit</h4>
+                                    <p class="text-gray-300 text-sm">Adaptive comfort</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Featured Categories -->
+        <section class="max-w-7xl mx-auto px-4 py-20">
+            <div class="flex justify-between items-center mb-12">
+                <h2 class="text-4xl font-bold">Shop by Category</h2>
+                <a href="#" class="text-gray-600 hover:text-black flex items-center gap-2">
+                    View All Categories
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="group relative overflow-hidden rounded-2xl cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Running" class="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
+                    <div class="absolute bottom-6 left-6 text-white">
+                        <h3 class="text-2xl font-bold mb-2">Running</h3>
+                        <p class="text-sm text-gray-300">120+ Products</p>
+                        <button class="mt-4 bg-white text-black px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                            Shop Now
+                        </button>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-2xl cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1608231387042-66d7a4cc7519" alt="Basketball" class="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
+                    <div class="absolute bottom-6 left-6 text-white">
+                        <h3 class="text-2xl font-bold mb-2">Basketball</h3>
+                        <p class="text-sm text-gray-300">85+ Products</p>
+                        <button class="mt-4 bg-white text-black px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                            Shop Now
+                        </button>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-2xl cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a" alt="Lifestyle" class="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
+                    <div class="absolute bottom-6 left-6 text-white">
+                        <h3 class="text-2xl font-bold mb-2">Lifestyle</h3>
+                        <p class="text-sm text-gray-300">200+ Products</p>
+                        <button class="mt-4 bg-white text-black px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                            Shop Now
+                        </button>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-2xl cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa" alt="Training" class="w-full h-80 object-cover transform group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
+                    <div class="absolute bottom-6 left-6 text-white">
+                        <h3 class="text-2xl font-bold mb-2">Training</h3>
+                        <p class="text-sm text-gray-300">150+ Products</p>
+                        <button class="mt-4 bg-white text-black px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                            Shop Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Sellers -->
+        <section class="bg-gray-100 py-20">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center mb-12">
+                    <h2 class="text-4xl font-bold">Best Sellers</h2>
+                    <div class="flex gap-4">
+                        <button class="text-gray-400 hover:text-black">
+                            <i class="fas fa-arrow-left text-2xl"></i>
+                        </button>
+                        <button class="text-gray-400 hover:text-black">
+                            <i class="fas fa-arrow-right text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Product Card 1 -->
+                    <a href="product-detail.html">
+                        <div class="product-card bg-white rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <div class="relative group">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Nike Air Max" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">-20%</span>
+                            </div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button class="bg-white text-black px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    Quick View
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold mb-1">Nike Air Max 270</h3>
+                                    <div class="text-sm text-gray-500">Running Collection</div>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-500">
+                                    <i class="fas fa-heart text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-gray-500 text-sm ml-2">(128 reviews)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-400 line-through text-sm">$199.99</span>
+                                    <span class="text-black font-bold text-xl ml-2">$159.99</span>
+                                </div>
+                                <button class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Repeat similar product cards for other items -->
+                    <a href="product-detail.html">
+                        <div class="product-card bg-white rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <div class="relative group">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Nike Air Max" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">-20%</span>
+                            </div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button class="bg-white text-black px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    Quick View
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold mb-1">Nike Air Max 270</h3>
+                                    <div class="text-sm text-gray-500">Running Collection</div>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-500">
+                                    <i class="fas fa-heart text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-gray-500 text-sm ml-2">(128 reviews)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-400 line-through text-sm">$199.99</span>
+                                    <span class="text-black font-bold text-xl ml-2">$159.99</span>
+                                </div>
+                                <button class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Product 2-->
+                    <a href="product-detail.html">
+                        <div class="product-card bg-white rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <div class="relative group">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Nike Air Max" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">-20%</span>
+                            </div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button class="bg-white text-black px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    Quick View
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold mb-1">Nike Air Max 270</h3>
+                                    <div class="text-sm text-gray-500">Running Collection</div>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-500">
+                                    <i class="fas fa-heart text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-gray-500 text-sm ml-2">(128 reviews)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-400 line-through text-sm">$199.99</span>
+                                    <span class="text-black font-bold text-xl ml-2">$159.99</span>
+                                </div>
+                                <button class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Product 3-->
+                    <!--Product 3-->
+                    <a href="product-detail.html">
+                        <div class="product-card bg-white rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow">
+                            <div class="relative group">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="Nike Air Max" class="w-full h-64 object-cover">
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">-20%</span>
+                            </div>
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button class="bg-white text-black px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    Quick View
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold mb-1">Nike Air Max 270</h3>
+                                    <div class="text-sm text-gray-500">Running Collection</div>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-500">
+                                    <i class="fas fa-heart text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400 flex">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-gray-500 text-sm ml-2">(128 reviews)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-gray-400 line-through text-sm">$199.99</span>
+                                    <span class="text-black font-bold text-xl ml-2">$159.99</span>
+                                </div>
+                                <button class="bg-black text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Product 4-->
+
+
+                </div>
+            </div>
+        </section>
+<!-- After Best Sellers section, add Trending Styles -->
+<section class="bg-white py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-12 text-center">Trending Styles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Style Card 1 -->
+            <div class="group relative overflow-hidden rounded-2xl">
+                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a" alt="Street Style" class="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-medium">#StreetStyle</span>
+                    <h3 class="text-white text-2xl font-bold mt-2">Urban Explorer Collection</h3>
+                    <p class="text-gray-200 mt-2">Perfect for city adventures</p>
+                </div>
+            </div>
+            <!-- Style Card 2 -->
+            <div class="group relative overflow-hidden rounded-2xl">
+                <img src="https://images.unsplash.com/photo-1605408499391-6368c628ef42" alt="Athletic" class="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-medium">#Performance</span>
+                    <h3 class="text-white text-2xl font-bold mt-2">Athletic Pro Series</h3>
+                    <p class="text-gray-200 mt-2">Engineered for performance</p>
+                </div>
+            </div>
+            <!-- Style Card 3 -->
+            <div class="group relative overflow-hidden rounded-2xl">
+                <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519" alt="Casual" class="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-medium">#Lifestyle</span>
+                    <h3 class="text-white text-2xl font-bold mt-2">Everyday Comfort</h3>
+                    <p class="text-gray-200 mt-2">Style meets comfort</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Size Guide Section -->
+<section class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-6">Find Your Perfect Fit</h2>
+                <p class="text-gray-600 mb-8">Not sure about your size? Use our size guide to find the perfect fit for your feet.</p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Size Conversion Chart</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2">US</th>
+                                    <th class="px-4 py-2">UK</th>
+                                    <th class="px-4 py-2">EU</th>
+                                    <th class="px-4 py-2">CM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border px-4 py-2 text-center">6</td>
+                                    <td class="border px-4 py-2 text-center">5.5</td>
+                                    <td class="border px-4 py-2 text-center">39</td>
+                                    <td class="border px-4 py-2 text-center">24</td>
+                                </tr>
+                                <tr>
+                                    <td class="border px-4 py-2 text-center">7</td>
+                                    <td class="border px-4 py-2 text-center">6.5</td>
+                                    <td class="border px-4 py-2 text-center">40</td>
+                                    <td class="border px-4 py-2 text-center">24.5</td>
+                                </tr>
+                                <tr>
+                                    <td class="border px-4 py-2 text-center">8</td>
+                                    <td class="border px-4 py-2 text-center">7.5</td>
+                                    <td class="border px-4 py-2 text-center">41</td>
+                                    <td class="border px-4 py-2 text-center">25</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <img 
+                    src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a" 
+                    alt="Shoe Measurement" 
+                    class="rounded-2xl shadow-2xl w-full h-[400px] object-cover"
+                    onerror="this.onerror=null; this.src='https://static.nike.com/a/images/f_auto/dpr_1.0,cs_srgb/w_1824,c_limit/5eb13840-2936-4ec4-82d4-64405440593a/nike-just-do-it.jpg';"
+                >
+                <div class="absolute -bottom-6 -right-6 bg-yellow-400 text-black p-4 rounded-xl shadow-lg">
+                    <p class="font-semibold">Pro Tip:</p>
+                    <p class="text-sm">Measure your feet in the evening when they're at their largest</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Shoe Care Guide -->
+<section class="bg-gradient-to-r from-gray-900 to-black text-white py-20">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-4xl font-bold mb-16 text-center">
+            <span class="relative">
+                Shoe Care Guide
+                <span class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-yellow-400"></span>
+            </span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-brush text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-6 text-center">Cleaning</h3>
+                <ul class="space-y-4 text-gray-300">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Use a soft brush to remove loose dirt</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Clean with mild soap and warm water</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Air dry at room temperature</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-6 text-center">Protection</h3>
+                <ul class="space-y-4 text-gray-300">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Apply water repellent spray</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Use shoe trees when storing</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Rotate shoes regularly</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-tools text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-6 text-center">Maintenance</h3>
+                <ul class="space-y-4 text-gray-300">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Replace insoles when worn</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Check soles for wear patterns</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-yellow-400 mt-1 mr-3"></i>
+                        <span>Polish leather shoes monthly</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add before the footer -->
+<section class="bg-white text-black py-20 mb-10">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-6">Download Our App</h2>
+                <p class="text-gray-400 mb-8">Get exclusive access to new releases, special offers, and more.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="bg-orange-500 text-white px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-gray-100 transition-colors">
+                        <i class="fab fa-apple text-2xl"></i>
+                        <div>
+                            <div class="text-xs">Download on the</div>
+                            <div class="text-lg font-semibold">App Store</div>
+                        </div>
+                    </a>
+                    <a href="#" class="bg-orange-500 text-white px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-gray-100 transition-colors">
+                        <i class="fab fa-google-play text-2xl"></i>
+                        <div>
+                            <div class="text-xs">Get it on</div>
+                            <div class="text-lg font-semibold">Google Play</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1609081219090-a6d81d3085bf" alt="Mobile App" class="rounded-2xl shadow-2xl">
+                <div class="absolute -top-6 -right-6 bg-yellow-400 text-white p-4 rounded-xl shadow-lg">
+                    <p class="font-semibold">Get 10% Off</p>
+                    <p class="text-sm">On your first in-app purchase</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gradient-to-r from-gray-900 to-black text-white pt-20 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Newsletter Section -->
+        <div class="relative -mt-32 mb-16">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 md:p-12 shadow-2xl">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-4">Join Our Newsletter</h3>
+                        <p class="text-gray-200 mb-4">Stay updated with the latest releases and exclusive offers!</p>
+                    </div>
+                    <div>
+                        <form class="flex flex-col md:flex-row gap-4">
+                            <input type="email" placeholder="Enter your email" class="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                            <button class="px-8 py-4 bg-yellow-400 text-black rounded-full font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Footer Content -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <!-- Brand Section -->
+            <div class="space-y-6">
+                <h2 class="text-3xl font-bold gradient-text">SneakerVault</h2>
+                <p class="text-gray-400 leading-relaxed">Your premium destination for authentic sneakers. Quality, style, and comfort in every step.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 relative inline-block">
+                    Quick Links
+                    <span class="absolute bottom-0 left-0 w-1/2 h-1 bg-yellow-400"></span>
+                </h3>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                        <i class="fas fa-chevron-right text-xs"></i>About Us</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                        <i class="fas fa-chevron-right text-xs"></i>FAQs</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                        <i class="fas fa-chevron-right text-xs"></i>Privacy Policy</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-2">
+                        <i class="fas fa-chevron-right text-xs"></i>Terms & Conditions</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 relative inline-block">
+                    Contact Us
+                    <span class="absolute bottom-0 left-0 w-1/2 h-1 bg-yellow-400"></span>
+                </h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <span class="text-gray-400">123 Sneaker Street, Fashion District, NY 10001</span>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <span class="text-gray-400">+1 (555) 123-4567</span>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <span class="text-gray-400">support@sneakervault.com</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Opening Hours -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 relative inline-block">
+                    Opening Hours
+                    <span class="absolute bottom-0 left-0 w-1/2 h-1 bg-yellow-400"></span>
+                </h3>
+                <ul class="space-y-4">
+                    <li class="flex justify-between text-gray-400">
+                        <span>Monday - Friday:</span>
+                        <span>9:00 AM - 10:00 PM</span>
+                    </li>
+                    <li class="flex justify-between text-gray-400">
+                        <span>Saturday:</span>
+                        <span>10:00 AM - 8:00 PM</span>
+                    </li>
+                    <li class="flex justify-between text-gray-400">
+                        <span>Sunday:</span>
+                        <span>12:00 PM - 6:00 PM</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="border-t border-gray-800 pt-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <p class="text-gray-400 text-center md:text-left">© 2023 SneakerVault. All rights reserved.</p>
+                <div class="flex justify-center md:justify-end space-x-4">
+                    <img src="https://raw.githubusercontent.com/danielmorsing/payment-icons/master/assets/visa.svg" alt="Visa" class="h-8">
+                    <img src="https://raw.githubusercontent.com/danielmorsing/payment-icons/master/assets/mastercard.svg" alt="Mastercard" class="h-8">
+                    <img src="https://raw.githubusercontent.com/danielmorsing/payment-icons/master/assets/paypal.svg" alt="PayPal" class="h-8">
+                    <img src="https://raw.githubusercontent.com/danielmorsing/payment-icons/master/assets/amex.svg" alt="American Express" class="h-8">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button with smooth scroll -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+            class="fixed bottom-8 right-8 bg-yellow-400 text-black w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-300 transition-all transform hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+        <!-- Rest of the sections with similar modern updates -->
+    </main>
+
+    <!-- Add GSAP animations -->
+    <script>
+        gsap.from(".product-card", {
+            duration: 0.8,
+            y: 50,
+            opacity: 0,
+            stagger: 0.2,
+            scrollTrigger: {
+                trigger: ".product-card",
+                start: "top 80%"
+            }
+        });
+
+        function changeMainImage(newSrc, thumbnailElement) {
+        const mainImage = document.getElementById('mainProductImage');
+        
+        // Add fade out class
+        mainImage.classList.add('fade-out');
+        
+        // Update image and fade in after a short delay
+        setTimeout(() => {
+            mainImage.src = newSrc;
+            mainImage.classList.remove('fade-out');
+            mainImage.classList.add('fade-in');
+            
+            // Remove fade-in class after animation completes
+            setTimeout(() => {
+                mainImage.classList.remove('fade-in');
+            }, 500);
+        }, 300);
+
+        // Update active thumbnail
+        document.querySelectorAll('.product-thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        thumbnailElement.classList.add('active');
+
+        // Add GSAP animation for extra smoothness
+        gsap.from(mainImage, {
+            scale: 0.95,
+            duration: 0.5,
+            ease: "power2.out",
+            delay: 0.3
+        });
+    }
+
+    particlesJS('particles-js', {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: "#ffffff" },
+            opacity: { value: 0.1 },
+            size: { value: 3 },
+            line_linked: { enable: true, distance: 150, opacity: 0.1 }
+        },
+        interactivity: {
+            detect_on: "canvas",
+            events: {
+                onhover: { enable: true, mode: "repulse" },
+                onclick: { enable: true, mode: "push" },
+                resize: true
+            }
+        }
+    });
+    </script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Check login status
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const guestView = document.querySelector('.guest-view');
+            const loggedInView = document.querySelector('.logged-in-view');
+            
+            if (isLoggedIn) {
+                guestView.classList.add('hidden');
+                loggedInView.classList.remove('hidden');
+                
+                // Update user info
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    const userImage = loggedInView.querySelector('img');
+                    const userName = loggedInView.querySelector('.font-medium');
+                    const userEmail = loggedInView.querySelector('.text-gray-500');
+                    
+                    userImage.src = user.avatar;
+                    userName.textContent = user.name;
+                    userEmail.textContent = user.email;
+                }
+            } else {
+                guestView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Check login status on page load
+        document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    </script>
+</body>
+</html>
