@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { bannerImage, products } from '../assets';
 
-function Home() {
+const Home = () => {
     return (
         <div className="bg-gray-50">
             {/* Hero Section */}
@@ -19,9 +20,12 @@ function Home() {
                         <p className="text-xl text-white mb-8">
                             Discover the latest collection of premium sneakers and elevate your footwear game.
                         </p>
-                        <button className="bg-white text-black px-8 py-3 rounded-full hover:bg-gray-100">
+                        <Link
+                            to="/shop"
+                            className="bg-white text-black px-8 py-3 rounded-full hover:bg-gray-100 inline-block"
+                        >
                             Shop Now
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -55,6 +59,6 @@ function Home() {
             </section>
         </div>
     );
-}
+};
 
 export default Home; 

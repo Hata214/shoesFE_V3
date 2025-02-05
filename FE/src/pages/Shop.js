@@ -1,43 +1,33 @@
-import React, { useState } from 'react';
-import { products } from '../assets';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 
 function Shop() {
     const [sortBy, setSortBy] = useState('popular');
     const [viewMode, setViewMode] = useState('grid');
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const productList = [
-        {
-            id: 1,
-            name: 'Nike Air Max 270',
-            category: 'Running',
-            price: 150.00,
-            originalPrice: 189.99,
-            image: products.nikeAirMax270,
-            rating: 4.5,
-            reviews: 128,
-            isNew: true,
-        },
-        {
-            id: 2,
-            name: 'Nike Air Force 1',
-            category: 'Lifestyle',
-            price: 120.00,
-            image: products.nikeAirForce1,
-            rating: 5,
-            reviews: 95,
-        },
-        {
-            id: 3,
-            name: 'Nike Air Max 90',
-            category: 'Running',
-            price: 140.00,
-            originalPrice: 169.99,
-            image: products.nikeAirMax90,
-            rating: 4.8,
-            reviews: 75,
-            isNew: true,
-        },
-    ];
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/products`);
+            setProducts(response.data.products);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching products:', err);
+            setError('Error loading products');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <div className="pt-32 text-center">Loading...</div>;
+    if (error) return <div className="pt-32 text-center text-red-500">{error}</div>;
 
     return (
         <div className="bg-gray-50">
@@ -88,12 +78,12 @@ function Shop() {
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {productList.map((product) => (
-                        <div key={product.id} className="bg-white rounded-xl p-6 shadow-lg">
+                    {products.map((product) => (
+                        <div key={product._id} className="bg-white rounded-xl p-6 shadow-lg">
                             {/* Product Image */}
                             <div className="relative mb-4">
                                 <img
-                                    src={product.image}
+                                    src={product.image || 'https://via.placeholder.com/400x400?text=Product+Image'}
                                     alt={product.name}
                                     className="w-full h-64 object-cover rounded-lg"
                                 />
@@ -113,14 +103,15 @@ function Shop() {
                                 <p className="text-gray-600 mb-2">{product.category}</p>
                                 <div className="flex items-center gap-2 mb-4">
                                     <div className="flex text-yellow-400">
-                                        {[...Array(Math.floor(product.rating))].map((_, i) => (
-                                            <i key={i} className="fas fa-star"></i>
+                                        {[...Array(5)].map((_, i) => (
+                                            <i
+                                                key={i}
+                                                className={`fas fa-star ${i < Math.floor(product.rating || 0) ? '' : 'text-gray-300'
+                                                    }`}
+                                            />
                                         ))}
-                                        {product.rating % 1 !== 0 && (
-                                            <i className="fas fa-star-half-alt"></i>
-                                        )}
                                     </div>
-                                    <span className="text-gray-600">({product.reviews})</span>
+                                    <span className="text-gray-600">({product.reviews || 0})</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <div>
