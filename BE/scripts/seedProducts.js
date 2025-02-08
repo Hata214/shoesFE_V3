@@ -43,7 +43,9 @@ const products = [
 // Function to convert image to base64
 const imageToBase64 = (imagePath) => {
     try {
+        // Đọc file hình ảnh
         const image = fs.readFileSync(imagePath);
+        // Chuyển đổi sang base64 và thêm prefix
         return `data:image/jpeg;base64,${image.toString('base64')}`;
     } catch (error) {
         console.error(`Error reading image: ${imagePath}`, error);
@@ -63,9 +65,12 @@ async function seedProducts() {
         console.log('Cleared existing products');
 
         // Read images and create products
-        const productsWithImages = await Promise.all(products.map(async (product, index) => {
+        const productsWithImages = await Promise.all(products.map(async (product) => {
+            // Tạo tên file hình ảnh từ tên sản phẩm
             const imageName = product.name.toLowerCase().replace(/ /g, '-') + '.jpg';
+            // Đường dẫn đến file hình ảnh
             const imagePath = path.join(__dirname, '../../FE/src/assets/images/products', imageName);
+            // Chuyển đổi hình ảnh sang base64
             const imageBase64 = imageToBase64(imagePath);
 
             return {

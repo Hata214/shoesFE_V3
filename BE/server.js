@@ -25,16 +25,28 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '50mb' }));  // Tăng giới hạn kích thước request
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(cors({
-    origin: 'http://localhost:3000',  // Thay đổi port nếu frontend chạy ở port khác
+
+// CORS configuration
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
-}));
+};
+app.use(cors(corsOptions));
 
 // Routes
 app.use('/api/v1', require('./routes/product'));
 app.use('/api/v1', require('./routes/admin'));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Server is healthy',
+        environment: process.env.NODE_ENV
+    });
+});
 
 // Handle undefined routes
 app.use('*', (req, res) => {
@@ -48,7 +60,7 @@ const PORT = process.env.PORT || 8000;
 
 // Handle server errors
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use. Please try a different port.`);
