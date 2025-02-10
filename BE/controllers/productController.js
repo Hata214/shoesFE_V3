@@ -19,26 +19,31 @@ exports.createProduct = async (req, res) => {
 // Get all products => /api/v1/products
 exports.getProducts = async (req, res) => {
     try {
-        // Add timeout for database query
+        // Add timeout for database query with longer duration
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Database query timeout')), 5000)
+            setTimeout(() => reject(new Error('Database query timeout')), 30000)
         );
 
-        const queryPromise = Product.find();
+        const queryPromise = Product.find().lean().exec();
 
         // Race between query and timeout
         const products = await Promise.race([queryPromise, timeoutPromise]);
 
+        // Send response in chunks if data is large
         res.status(200).json({
             success: true,
             count: products.length,
-            products
+            products: products.map(product => ({
+                ...product,
+                image: product.image ? product.image.substring(0, 100) + '...' : null // Truncate base64 for response
+            }))
         });
     } catch (error) {
         console.error('Product fetch error:', error);
         res.status(error.message === 'Database query timeout' ? 504 : 500).json({
             success: false,
-            error: error.message
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };

@@ -8,14 +8,18 @@ dotenv.config();
 
 // MongoDB connection options
 const mongooseOptions = {
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 30000,
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
     connectTimeoutMS: 10000,
-    maxPoolSize: 10,
-    minPoolSize: 5,
+    keepAlive: true,
+    keepAliveInitialDelay: 300000,
+    maxPoolSize: 50,
+    minPoolSize: 10,
     maxIdleTimeMS: 10000,
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    retryWrites: true,
+    w: "majority"
 };
 
 const app = express();
@@ -65,41 +69,28 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Connect to database
-mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
-    .then(() => {
+// Connect to database with retry mechanism
+const connectWithRetry = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
         console.log('MongoDB Connected Successfully');
         console.log('Environment:', process.env.NODE_ENV);
         console.log('CORS Origin:', process.env.CORS_ORIGIN);
-        console.log('Port:', process.env.PORT);
-        console.log('Routes initialized');
 
         // Routes
         app.use('/api/v1', require('./routes/product'));
         app.use('/api/v1', require('./routes/admin'));
-
-        // Handle undefined routes
-        app.use('*', (req, res) => {
-            console.log('404 Error - Route not found:', req.originalUrl);
-            res.status(404).json({
-                success: false,
-                message: 'Route not found',
-                path: req.originalUrl
-            });
-        });
 
         // Start server
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`);
         });
-    })
-    .catch(err => {
-        console.error('MongoDB connection error details:', {
-            name: err.name,
-            message: err.message,
-            code: err.code,
-            stack: err.stack
-        });
-        process.exit(1);
-    }); 
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        console.log('Retrying in 5 seconds...');
+        setTimeout(connectWithRetry, 5000);
+    }
+};
+
+connectWithRetry(); 
