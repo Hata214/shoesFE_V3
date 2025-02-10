@@ -32,10 +32,13 @@ app.use(cors(corsOptions));
 
 // Health check endpoint (đặt trước khi kết nối MongoDB)
 app.get('/health', (req, res) => {
+    console.log('Health check endpoint called');
     res.status(200).json({
         success: true,
         message: 'Server is healthy',
-        environment: process.env.NODE_ENV
+        environment: process.env.NODE_ENV,
+        mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing',
+        corsOrigin: process.env.CORS_ORIGIN || 'Default: http://localhost:3000'
     });
 });
 
@@ -43,6 +46,10 @@ app.get('/health', (req, res) => {
 mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
     .then(() => {
         console.log('MongoDB Connected Successfully');
+        console.log('Environment:', process.env.NODE_ENV);
+        console.log('CORS Origin:', process.env.CORS_ORIGIN);
+        console.log('Port:', process.env.PORT);
+        console.log('Routes initialized');
 
         // Routes (chỉ khởi tạo routes sau khi kết nối MongoDB thành công)
         app.use('/api/v1', require('./routes/product'));
@@ -50,9 +57,11 @@ mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
 
         // Handle undefined routes
         app.use('*', (req, res) => {
+            console.log('404 Error - Route not found:', req.originalUrl);
             res.status(404).json({
                 success: false,
-                message: 'Route not found'
+                message: 'Route not found',
+                path: req.originalUrl
             });
         });
 
@@ -63,6 +72,11 @@ mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
         });
     })
     .catch(err => {
-        console.error('MongoDB connection error:', err);
+        console.error('MongoDB connection error details:', {
+            name: err.name,
+            message: err.message,
+            code: err.code,
+            stack: err.stack
+        });
         process.exit(1);
     }); 
