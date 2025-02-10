@@ -1,8 +1,23 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 // Import Product model
 const Product = require('../models/Product');
+
+// Function to convert image to base64
+const imageToBase64 = (imagePath) => {
+    try {
+        // Read image file
+        const image = fs.readFileSync(imagePath);
+        // Convert to base64 and prepend data URI scheme
+        return `data:image/jpeg;base64,${image.toString('base64')}`;
+    } catch (error) {
+        console.error('Error converting image to base64:', error);
+        return null;
+    }
+};
 
 // Sample product data
 const products = [
@@ -13,7 +28,7 @@ const products = [
         brand: 'Nike',
         category: 'Running',
         stock: 50,
-        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-max-270.jpg',
+        image: imageToBase64(path.join(__dirname, '../../FE/src/assets/images/products/nike-air-max-270.jpg')),
         rating: 4.5,
         reviews: 128
     },
@@ -24,7 +39,7 @@ const products = [
         brand: 'Nike',
         category: 'Basketball',
         stock: 75,
-        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-force-1.jpg',
+        image: imageToBase64(path.join(__dirname, '../../FE/src/assets/images/products/nike-air-force-1.jpg')),
         rating: 4.8,
         reviews: 256
     },
@@ -35,7 +50,7 @@ const products = [
         brand: 'Nike',
         category: 'Running',
         stock: 35,
-        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-max-90.jpg',
+        image: imageToBase64(path.join(__dirname, '../../FE/src/assets/images/products/nike-air-max-90.jpg')),
         rating: 4.6,
         reviews: 189
     }
@@ -44,24 +59,40 @@ const products = [
 // Function to seed the database
 async function seedProducts() {
     try {
-        // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI);
+        // Connect to MongoDB with increased timeout
+        await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 30000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 30000
+        });
         console.log('Connected to MongoDB');
 
         // Clear existing products
         await Product.deleteMany({});
         console.log('Cleared existing products');
 
+        // Filter out products with failed image conversion
+        const validProducts = products.filter(product => product.image !== null);
+
+        if (validProducts.length === 0) {
+            throw new Error('No valid products to seed');
+        }
+
         // Insert products into database
-        await Product.insertMany(products);
+        await Product.insertMany(validProducts);
         console.log('Products seeded successfully');
 
-        // Disconnect from MongoDB
-        await mongoose.disconnect();
-        console.log('Disconnected from MongoDB');
     } catch (error) {
         console.error('Error seeding products:', error);
         process.exit(1);
+    } finally {
+        // Disconnect from MongoDB
+        try {
+            await mongoose.disconnect();
+            console.log('Disconnected from MongoDB');
+        } catch (error) {
+            console.error('Error disconnecting from MongoDB:', error);
+        }
     }
 }
 
