@@ -10,9 +10,7 @@ dotenv.config();
 const mongooseOptions = {
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
-    connectTimeoutMS: 30000,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    connectTimeoutMS: 30000
 };
 
 const app = express();
@@ -30,7 +28,15 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Health check endpoint (đặt trước khi kết nối MongoDB)
+// Root route
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Welcome to ShoeShop API'
+    });
+});
+
+// Health check endpoint
 app.get('/health', (req, res) => {
     console.log('Health check endpoint called');
     res.status(200).json({
@@ -51,7 +57,7 @@ mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
         console.log('Port:', process.env.PORT);
         console.log('Routes initialized');
 
-        // Routes (chỉ khởi tạo routes sau khi kết nối MongoDB thành công)
+        // Routes
         app.use('/api/v1', require('./routes/product'));
         app.use('/api/v1', require('./routes/admin'));
 
