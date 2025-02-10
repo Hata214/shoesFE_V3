@@ -8,8 +8,11 @@ dotenv.config();
 
 // MongoDB connection options
 const mongooseOptions = {
-    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-    socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    serverSelectionTimeoutMS: 30000, // Tăng timeout lên 30s
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 };
 
 // Connect to database
@@ -56,7 +59,7 @@ app.use('*', (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8080;
 
 // Handle server errors
 const server = app.listen(PORT, () => {
