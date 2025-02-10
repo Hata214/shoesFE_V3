@@ -8,9 +8,14 @@ dotenv.config();
 
 // MongoDB connection options
 const mongooseOptions = {
-    serverSelectionTimeoutMS: 30000,
-    socketTimeoutMS: 45000,
-    connectTimeoutMS: 30000
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 10000,
+    maxPoolSize: 10,
+    minPoolSize: 5,
+    maxIdleTimeMS: 10000,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 };
 
 const app = express();
@@ -22,7 +27,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // CORS configuration
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://shoes-fe-v3.vercel.app',
+    'https://shoes-fe-v3-frontend.vercel.app',
     'https://shoes-fe-v3-fullweb.vercel.app'
 ];
 

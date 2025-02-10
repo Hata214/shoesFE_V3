@@ -19,14 +19,24 @@ exports.createProduct = async (req, res) => {
 // Get all products => /api/v1/products
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        // Add timeout for database query
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Database query timeout')), 5000)
+        );
+
+        const queryPromise = Product.find();
+
+        // Race between query and timeout
+        const products = await Promise.race([queryPromise, timeoutPromise]);
+
         res.status(200).json({
             success: true,
             count: products.length,
             products
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Product fetch error:', error);
+        res.status(error.message === 'Database query timeout' ? 504 : 500).json({
             success: false,
             error: error.message
         });
