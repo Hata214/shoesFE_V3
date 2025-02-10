@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
@@ -15,6 +13,7 @@ const products = [
         brand: 'Nike',
         category: 'Running',
         stock: 50,
+        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-max-270.jpg',
         rating: 4.5,
         reviews: 128
     },
@@ -25,6 +24,7 @@ const products = [
         brand: 'Nike',
         category: 'Basketball',
         stock: 75,
+        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-force-1.jpg',
         rating: 4.8,
         reviews: 256
     },
@@ -35,23 +35,11 @@ const products = [
         brand: 'Nike',
         category: 'Running',
         stock: 35,
+        image: 'https://raw.githubusercontent.com/Hata214/shoesFE_V3/main/FE/src/assets/images/products/nike-air-max-90.jpg',
         rating: 4.6,
         reviews: 189
     }
 ];
-
-// Function to convert image to base64
-const imageToBase64 = (imagePath) => {
-    try {
-        // Đọc file hình ảnh
-        const image = fs.readFileSync(imagePath);
-        // Chuyển đổi sang base64 và thêm prefix
-        return `data:image/jpeg;base64,${image.toString('base64')}`;
-    } catch (error) {
-        console.error(`Error reading image: ${imagePath}`, error);
-        return null;
-    }
-};
 
 // Function to seed the database
 async function seedProducts() {
@@ -64,23 +52,8 @@ async function seedProducts() {
         await Product.deleteMany({});
         console.log('Cleared existing products');
 
-        // Read images and create products
-        const productsWithImages = await Promise.all(products.map(async (product) => {
-            // Tạo tên file hình ảnh từ tên sản phẩm
-            const imageName = product.name.toLowerCase().replace(/ /g, '-') + '.jpg';
-            // Đường dẫn đến file hình ảnh
-            const imagePath = path.join(__dirname, '../../FE/src/assets/images/products', imageName);
-            // Chuyển đổi hình ảnh sang base64
-            const imageBase64 = imageToBase64(imagePath);
-
-            return {
-                ...product,
-                image: imageBase64
-            };
-        }));
-
         // Insert products into database
-        await Product.insertMany(productsWithImages);
+        await Product.insertMany(products);
         console.log('Products seeded successfully');
 
         // Disconnect from MongoDB
