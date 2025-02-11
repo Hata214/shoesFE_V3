@@ -37,17 +37,40 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
+            console.error('CORS blocked origin:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    maxAge: 86400 // 24 hours
 };
+
 app.use(cors(corsOptions));
+
+// Add error handler for CORS
+app.use((err, req, res, next) => {
+    if (err.message === 'Not allowed by CORS') {
+        console.error('CORS Error:', {
+            origin: req.headers.origin,
+            method: req.method,
+            path: req.path,
+            allowedOrigins
+        });
+        return res.status(403).json({
+            success: false,
+            message: 'CORS not allowed for this origin'
+        });
+    }
+    next(err);
+});
 
 // Root route
 app.get('/', (req, res) => {
