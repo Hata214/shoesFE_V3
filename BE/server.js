@@ -28,6 +28,10 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// API Routes - Define before CORS middleware
+app.use('/api/v1', require('./routes/product'));
+app.use('/api/v1', require('./routes/admin'));
+
 // Handle preflight requests
 app.options('*', (req, res) => {
     console.log('Handling OPTIONS request');
@@ -71,10 +75,6 @@ app.get('/health', (req, res) => {
         mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing'
     });
 });
-
-// API Routes
-app.use('/api/v1', require('./routes/product'));
-app.use('/api/v1', require('./routes/admin'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
