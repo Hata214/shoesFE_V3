@@ -21,15 +21,20 @@ const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': 'https://shoes-fe-v3-frontend.vercel.app'
     },
     withCredentials: true,
-    timeout: 10000 // 10 seconds timeout
+    timeout: 30000 // 30 seconds timeout
 });
 
 // Request interceptor
 api.interceptors.request.use(
     (config) => {
+        // Add CORS headers
+        config.headers['Access-Control-Allow-Origin'] = 'https://shoes-fe-v3-frontend.vercel.app';
+        config.headers['Access-Control-Allow-Credentials'] = 'true';
+
         // Log request
         console.log('API Request:', {
             url: config.url,

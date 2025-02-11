@@ -28,16 +28,23 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS configuration
-app.use(cors({
-    origin: ['https://shoes-fe-v3-frontend.vercel.app', 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    credentials: true,
-    maxAge: 86400
-}));
+// CORS Middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
 
-// Root route
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Max-Age', '86400');
+        return res.status(200).json({});
+    }
+
+    next();
+});
+
+// Routes
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
@@ -45,40 +52,47 @@ app.get('/', (req, res) => {
     });
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
-    console.log('Health check endpoint called');
     res.status(200).json({
         success: true,
         message: 'Server is healthy',
         environment: process.env.NODE_ENV,
         mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing',
-        corsOrigin: process.env.CORS_ORIGIN || 'Default: http://localhost:3000'
+        corsOrigin: 'https://shoes-fe-v3-frontend.vercel.app'
     });
 });
 
-// Connect to database with retry mechanism
-const connectWithRetry = async () => {
+// API Routes
+app.use('/api/v1', require('./routes/product'));
+app.use('/api/v1', require('./routes/admin'));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+});
+
+// Connect to database and start server
+const startServer = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
-        console.log('MongoDB Connected Successfully');
-        console.log('Environment:', process.env.NODE_ENV);
-        console.log('CORS Origin:', process.env.CORS_ORIGIN);
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('MongoDB Connected');
 
-        // Routes
-        app.use('/api/v1', require('./routes/product'));
-        app.use('/api/v1', require('./routes/admin'));
-
-        // Start server
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+            console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
         });
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
-        console.log('Retrying in 5 seconds...');
-        setTimeout(connectWithRetry, 5000);
+    } catch (error) {
+        console.error('Error starting server:', error);
+        process.exit(1);
     }
 };
 
-connectWithRetry(); 
+startServer(); 
