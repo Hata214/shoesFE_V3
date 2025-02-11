@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Constants
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-fprf.vercel.app/api/v1';
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
 
 // Helper function to handle API URL
 const getApiUrl = (endpoint) => {
@@ -22,7 +22,8 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    }
+    },
+    timeout: 10000 // 10 seconds timeout
 });
 
 // Request interceptor
@@ -57,12 +58,26 @@ api.interceptors.response.use(
     },
     (error) => {
         // Log error details
-        console.error('API Response Error:', {
-            message: error.message,
-            response: error.response?.data,
-            status: error.response?.status,
-            headers: error.response?.headers
-        });
+        if (error.response) {
+            // Server trả về response với status code nằm ngoài range 2xx
+            console.error('API Response Error:', {
+                data: error.response.data,
+                status: error.response.status,
+                headers: error.response.headers
+            });
+        } else if (error.request) {
+            // Request đã được gửi nhưng không nhận được response
+            console.error('API Request Error:', {
+                request: error.request,
+                message: 'No response received'
+            });
+        } else {
+            // Có lỗi khi setting up request
+            console.error('API Error:', {
+                message: error.message,
+                config: error.config
+            });
+        }
         return Promise.reject(error);
     }
 );
