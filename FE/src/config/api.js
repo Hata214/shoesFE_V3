@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export const API_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
 
 export const endpoints = {
@@ -7,8 +9,6 @@ export const endpoints = {
 };
 
 // Add axios configuration
-import axios from 'axios';
-
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1',
     withCredentials: true,
