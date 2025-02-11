@@ -3,11 +3,6 @@ import axios from 'axios';
 // Constants
 const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
 
-// Helper function to handle API URL
-const getApiUrl = (endpoint) => {
-    return `${BASE_URL}${endpoint}`;
-};
-
 // API endpoints
 export const endpoints = {
     products: '/products',
@@ -21,8 +16,7 @@ const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Origin': 'https://shoes-fe-v3-frontend.vercel.app'
+        'Accept': 'application/json'
     },
     withCredentials: true,
     timeout: 30000 // 30 seconds timeout
@@ -31,10 +25,6 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
     (config) => {
-        // Add CORS headers
-        config.headers['Access-Control-Allow-Origin'] = 'https://shoes-fe-v3-frontend.vercel.app';
-        config.headers['Access-Control-Allow-Credentials'] = 'true';
-
         // Log request
         console.log('API Request:', {
             url: config.url,
@@ -88,7 +78,5 @@ api.interceptors.response.use(
     }
 );
 
-// Exports
 export const API_URL = BASE_URL;
-export { getApiUrl };
 export default api; 
