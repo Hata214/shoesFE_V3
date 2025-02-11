@@ -4,4 +4,17 @@ export const endpoints = {
     products: '/products',
     product: '/product',
     newProduct: '/product/new',
-}; 
+};
+
+// Add axios configuration
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+export default api; 
