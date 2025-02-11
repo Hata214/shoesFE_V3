@@ -1,4 +1,4 @@
-export const API_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend-bdh0hh1t1-hata214s-projects.vercel.app/api/v1';
+export const API_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
 
 export const endpoints = {
     products: '/products',
@@ -10,7 +10,7 @@ export const endpoints = {
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend-bdh0hh1t1-hata214s-projects.vercel.app/api/v1',
+    baseURL: process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1',
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',

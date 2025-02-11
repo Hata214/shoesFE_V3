@@ -33,7 +33,9 @@ const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
             'http://localhost:3000',
-            'https://shoes-fe-v3-frontend.vercel.app'
+            'https://shoes-fe-v3-frontend.vercel.app',
+            'https://shoes-fe-v3-frontend-git-main-hata214s-projects.vercel.app',
+            'https://shoes-fe-v3-frontend-mxfkkr108-hata214s-projects.vercel.app'
         ];
 
         if (!origin || allowedOrigins.includes(origin)) {
@@ -45,7 +47,7 @@ const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
     maxAge: 86400 // 24 hours
 };
 
