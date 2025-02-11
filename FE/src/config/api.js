@@ -1,16 +1,18 @@
 import axios from 'axios';
 
-export const API_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
+// Constants
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
 
+// API endpoints
 export const endpoints = {
     products: '/products',
     product: '/product',
     newProduct: '/product/new',
 };
 
-// Add axios configuration
+// Axios instance configuration
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1',
+    baseURL: BASE_URL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ const api = axios.create({
     }
 });
 
-// Add request interceptor for debugging
+// Request interceptor
 api.interceptors.request.use(
     (config) => {
         console.log('API Request:', {
@@ -37,7 +39,7 @@ api.interceptors.request.use(
     }
 );
 
-// Add response interceptor for debugging
+// Response interceptor
 api.interceptors.response.use(
     (response) => {
         console.log('API Response:', {
@@ -55,4 +57,6 @@ api.interceptors.response.use(
     }
 );
 
+// Exports
+export const API_URL = BASE_URL;
 export default api; 
