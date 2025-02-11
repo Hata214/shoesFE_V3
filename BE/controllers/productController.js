@@ -4,11 +4,13 @@ const Product = require('../models/Product');
 exports.createProduct = async (req, res) => {
     try {
         const product = await Product.create(req.body);
+        console.log('Hello World - Product created successfully');
         res.status(201).json({
             success: true,
             product
         });
     } catch (error) {
+        console.error('Error creating product:', error);
         res.status(400).json({
             success: false,
             error: error.message
@@ -29,6 +31,7 @@ exports.getProducts = async (req, res) => {
         // Race between query and timeout
         const products = await Promise.race([queryPromise, timeoutPromise]);
 
+        console.log('Hello World - Products fetched successfully');
         // Send response in chunks if data is large
         res.status(200).json({
             success: true,
@@ -58,11 +61,13 @@ exports.getSingleProduct = async (req, res) => {
                 message: 'Product not found'
             });
         }
+        console.log('Hello World - Single product fetched successfully');
         res.status(200).json({
             success: true,
             product
         });
     } catch (error) {
+        console.error('Error fetching product:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -84,11 +89,13 @@ exports.updateProduct = async (req, res) => {
             new: true,
             runValidators: true
         });
+        console.log('Hello World - Product updated successfully');
         res.status(200).json({
             success: true,
             product
         });
     } catch (error) {
+        console.error('Error updating product:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -107,11 +114,13 @@ exports.deleteProduct = async (req, res) => {
             });
         }
         await Product.findByIdAndDelete(req.params.id);
+        console.log('Hello World - Product deleted successfully');
         res.status(200).json({
             success: true,
             message: 'Product deleted successfully'
         });
     } catch (error) {
+        console.error('Error deleting product:', error);
         res.status(500).json({
             success: false,
             error: error.message
