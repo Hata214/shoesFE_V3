@@ -28,18 +28,16 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Enable CORS for all routes
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+// CORS configuration
+const corsOptions = {
+    origin: 'https://shoes-fe-v3-frontend.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
 
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-});
+app.use(cors(corsOptions));
 
 // Routes
 app.get('/', (req, res) => {
@@ -55,7 +53,7 @@ app.get('/health', (req, res) => {
         message: 'Server is healthy',
         environment: process.env.NODE_ENV,
         mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing',
-        corsOrigin: 'https://shoes-fe-v3-frontend.vercel.app'
+        corsOrigin: corsOptions.origin
     });
 });
 
@@ -81,11 +79,11 @@ const startServer = async () => {
             useUnifiedTopology: true
         });
         console.log('MongoDB Connected');
+        console.log('CORS Origin:', corsOptions.origin);
 
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
             console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-            console.log('CORS Origin: https://shoes-fe-v3-frontend.vercel.app');
         });
     } catch (error) {
         console.error('Error starting server:', error);
