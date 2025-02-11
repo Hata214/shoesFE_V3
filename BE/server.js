@@ -32,13 +32,15 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const whitelist = [
     'https://shoes-fe-v3-frontend.vercel.app',
     'https://shoes-fe-v3-frontend-hata214s-projects.vercel.app',
+    'https://shoes-fe-v3-backend.vercel.app',
     'http://localhost:3000'  // For local development
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
         console.log('Request origin:', origin);
-        if (!origin || whitelist.includes(origin)) {
+        // In development, origin might be undefined
+        if (!origin || whitelist.some(domain => origin.includes(domain.replace('https://', '')))) {
             callback(null, true);
         } else {
             console.log('Blocked by CORS:', origin);
