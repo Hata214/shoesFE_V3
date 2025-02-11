@@ -28,30 +28,26 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS Middleware
-app.use((req, res, next) => {
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
+// CORS configuration
+const whitelist = ['https://shoes-fe-v3-frontend.vercel.app'];
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('Blocked by CORS:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+};
 
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
-
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-    // Handle preflight
-    if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Max-Age', '86400');
-        res.status(200).end();
-        return;
-    }
-
-    next();
-});
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
 // Log all requests
 app.use((req, res, next) => {
@@ -73,7 +69,7 @@ app.get('/health', (req, res) => {
         message: 'Server is healthy',
         environment: process.env.NODE_ENV,
         mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing',
-        corsOrigin: 'https://shoes-fe-v3-frontend.vercel.app'
+        corsWhitelist: whitelist
     });
 });
 
@@ -84,6 +80,17 @@ app.use('/api/v1', require('./routes/admin'));
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
+
+    // Handle CORS errors
+    if (err.message === 'Not allowed by CORS') {
+        return res.status(403).json({
+            success: false,
+            message: 'CORS Error: Origin not allowed',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+
+    // Handle other errors
     res.status(500).json({
         success: false,
         message: 'Internal server error',
@@ -99,7 +106,7 @@ const startServer = async () => {
             useUnifiedTopology: true
         });
         console.log('MongoDB Connected');
-        console.log('CORS Origin: https://shoes-fe-v3-frontend.vercel.app');
+        console.log('CORS Whitelist:', whitelist);
 
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
