@@ -31,12 +31,14 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // CORS configuration
 const whitelist = [
     'https://shoes-fe-v3-frontend.vercel.app',
-    'https://shoes-fe-v3-backend-bdh0hh1t1-hata214s-projects.vercel.app',
+    'https://shoes-fe-v3-frontend-hata214s-projects.vercel.app',
     'http://localhost:3000'  // For local development
 ];
+
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || whitelist.indexOf(origin) !== -1) {
+        console.log('Request origin:', origin);
+        if (!origin || whitelist.includes(origin)) {
             callback(null, true);
         } else {
             console.log('Blocked by CORS:', origin);
@@ -47,15 +49,17 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
+    maxAge: 86400 // 24 hours
 };
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Log all requests
+// Log all requests including CORS details
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+    console.log('Request headers:', req.headers);
     next();
 });
 
