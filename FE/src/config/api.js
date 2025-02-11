@@ -1,13 +1,19 @@
 import axios from 'axios';
 
 // Constants
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-fprf.vercel.app/api/v1';
+
+// Helper function to handle API URL
+const getApiUrl = (endpoint) => {
+    return `${BASE_URL}${endpoint}`;
+};
 
 // API endpoints
 export const endpoints = {
     products: '/products',
     product: '/product',
     newProduct: '/product/new',
+    adminLogin: '/admin/login'
 };
 
 // Axios instance configuration
@@ -59,4 +65,5 @@ api.interceptors.response.use(
 
 // Exports
 export const API_URL = BASE_URL;
+export { getApiUrl };
 export default api; 

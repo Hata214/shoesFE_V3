@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../../config/api';
+import api, { endpoints } from '../../config/api';
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -21,11 +20,16 @@ const AdminLogin = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${API_URL}/admin/login`, formData);
-            localStorage.setItem('adminToken', response.data.token);
-            navigate('/admin/dashboard');
+            const response = await api.post(endpoints.adminLogin, formData);
+            if (response.data.success) {
+                localStorage.setItem('adminToken', response.data.token);
+                navigate('/admin/dashboard');
+            } else {
+                setError(response.data.message || 'Login failed');
+            }
         } catch (err) {
-            setError('Invalid admin credentials');
+            console.error('Login error:', err);
+            setError(err.response?.data?.message || 'Invalid admin credentials');
         }
     };
 
