@@ -31,8 +31,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // CORS configuration
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://shoes-fe-v3-frontend.vercel.app',
-    'https://shoes-fe-v3-fullweb.vercel.app'
+    'https://shoes-fe-v3-frontend.vercel.app'
 ];
 
 const corsOptions = {
@@ -40,7 +39,7 @@ const corsOptions = {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             console.error('CORS blocked origin:', origin);
@@ -48,28 +47,21 @@ const corsOptions = {
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
     maxAge: 86400 // 24 hours
 };
 
+// Apply CORS middleware before routes
 app.use(cors(corsOptions));
 
-// Add error handler for CORS
-app.use((err, req, res, next) => {
-    if (err.message === 'Not allowed by CORS') {
-        console.error('CORS Error:', {
-            origin: req.headers.origin,
-            method: req.method,
-            path: req.path,
-            allowedOrigins
-        });
-        return res.status(403).json({
-            success: false,
-            message: 'CORS not allowed for this origin'
-        });
-    }
-    next(err);
+// Add CORS headers to all responses
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
 });
 
 // Root route
