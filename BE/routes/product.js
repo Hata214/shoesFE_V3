@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { processImage } = require('../middleware/imageProcessor');
+const { isAuthenticatedAdmin } = require('../middleware/auth');
 
 const {
     getProducts,
@@ -10,11 +11,14 @@ const {
     deleteProduct
 } = require('../controllers/productController');
 
+// Public routes
 router.route('/products').get(getProducts);
-router.route('/product/new').post(processImage, createProduct);
+router.route('/product/:id').get(getSingleProduct);
+
+// Protected routes - require admin authentication
+router.route('/product/new').post(isAuthenticatedAdmin, processImage, createProduct);
 router.route('/product/:id')
-    .get(getSingleProduct)
-    .put(processImage, updateProduct)
-    .delete(deleteProduct);
+    .put(isAuthenticatedAdmin, processImage, updateProduct)
+    .delete(isAuthenticatedAdmin, deleteProduct);
 
 module.exports = router; 
