@@ -29,45 +29,13 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // CORS configuration
-const corsOptions = {
-    origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:3000',
-            'https://shoes-fe-v3-frontend.vercel.app',
-            'https://shoes-fe-v3-frontend-git-main-hata214s-projects.vercel.app',
-            'https://shoes-fe-v3-frontend-mxfkkr108-hata214s-projects.vercel.app'
-        ];
-
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.error('CORS blocked origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
+app.use(cors({
+    origin: ['https://shoes-fe-v3-frontend.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    maxAge: 86400 // 24 hours
-};
-
-app.use(cors(corsOptions));
-
-// Error handler for CORS
-app.use((err, req, res, next) => {
-    if (err.message === 'Not allowed by CORS') {
-        console.error('CORS Error:', {
-            origin: req.headers.origin,
-            method: req.method,
-            path: req.path
-        });
-        return res.status(403).json({
-            success: false,
-            message: 'CORS not allowed for this origin'
-        });
-    }
-    next(err);
-});
+    credentials: true,
+    maxAge: 86400
+}));
 
 // Root route
 app.get('/', (req, res) => {
