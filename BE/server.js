@@ -28,59 +28,27 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// CORS configuration
-const whitelist = [
-    'https://shoes-fe-v3-frontend.vercel.app',
-    'https://shoes-fe-v3-frontend-hata214s-projects.vercel.app',
-    'https://shoes-fe-v3-backend.vercel.app',
-    'https://shoes-fe-v3-backend-bdh0hh1t1-hata214s-projects.vercel.app',
-    'http://localhost:3000'  // For local development
-];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        console.log('Request origin:', origin);
-        // In development, origin might be undefined
-        if (!origin || whitelist.some(domain => origin.includes('vercel.app')) || whitelist.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.log('Blocked by CORS:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    maxAge: 86400 // 24 hours
-};
-
-// Apply CORS middleware with more detailed logging
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
+// Handle preflight requests
+app.options('*', (req, res) => {
+    console.log('Handling OPTIONS request');
+    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     res.header('Access-Control-Allow-Credentials', 'true');
-
-    // Log CORS headers
-    console.log('CORS Headers set:', {
-        origin: res.getHeader('Access-Control-Allow-Origin'),
-        methods: res.getHeader('Access-Control-Allow-Methods'),
-        headers: res.getHeader('Access-Control-Allow-Headers'),
-        credentials: res.getHeader('Access-Control-Allow-Credentials')
-    });
-
-    if (req.method === 'OPTIONS') {
-        res.sendStatus(200);
-    } else {
-        next();
-    }
+    res.header('Access-Control-Max-Age', '86400');
+    res.sendStatus(200);
 });
 
-app.use(cors(corsOptions));
+// CORS middleware for all other requests
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 
-// Log all requests including CORS details
+// Request logging
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
     console.log('Request headers:', req.headers);
@@ -100,8 +68,7 @@ app.get('/health', (req, res) => {
         success: true,
         message: 'Server is healthy',
         environment: process.env.NODE_ENV,
-        mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing',
-        corsWhitelist: whitelist
+        mongodbUri: process.env.MONGODB_URI ? 'Configured' : 'Missing'
     });
 });
 
@@ -112,17 +79,6 @@ app.use('/api/v1', require('./routes/admin'));
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-
-    // Handle CORS errors
-    if (err.message === 'Not allowed by CORS') {
-        return res.status(403).json({
-            success: false,
-            message: 'CORS Error: Origin not allowed',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
-    }
-
-    // Handle other errors
     res.status(500).json({
         success: false,
         message: 'Internal server error',
@@ -138,7 +94,6 @@ const startServer = async () => {
             useUnifiedTopology: true
         });
         console.log('MongoDB Connected');
-        console.log('CORS Whitelist:', whitelist);
 
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
