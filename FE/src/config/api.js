@@ -19,23 +19,22 @@ export const endpoints = {
 // Axios instance configuration
 const api = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    },
-    validateStatus: function (status) {
-        return status >= 200 && status < 500;
     }
 });
 
 // Request interceptor
 api.interceptors.request.use(
     (config) => {
+        // Log request
         console.log('API Request:', {
             url: config.url,
             method: config.method,
-            headers: config.headers
+            data: config.data,
+            headers: config.headers,
+            baseURL: config.baseURL
         });
         return config;
     },
@@ -48,16 +47,21 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
     (response) => {
+        // Log response
         console.log('API Response:', {
             status: response.status,
-            data: response.data
+            data: response.data,
+            headers: response.headers
         });
         return response;
     },
     (error) => {
+        // Log error details
         console.error('API Response Error:', {
             message: error.message,
-            response: error.response?.data
+            response: error.response?.data,
+            status: error.response?.status,
+            headers: error.response?.headers
         });
         return Promise.reject(error);
     }
