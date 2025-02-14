@@ -6,58 +6,29 @@ const dotenv = require('dotenv');
 // Load env vars
 dotenv.config();
 
-// MongoDB connection options
-const mongooseOptions = {
-    serverSelectionTimeoutMS: 10000,
-    socketTimeoutMS: 45000,
-    connectTimeoutMS: 10000,
-    keepAlive: true,
-    keepAliveInitialDelay: 300000,
-    maxPoolSize: 50,
-    minPoolSize: 10,
-    maxIdleTimeMS: 10000,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    retryWrites: true,
-    w: "majority"
-};
-
 const app = express();
 
 // Basic middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// API Routes - Define before CORS middleware
-app.use('/api/v1', require('./routes/product'));
-app.use('/api/v1', require('./routes/admin'));
-
-// Handle preflight requests
-app.options('*', (req, res) => {
-    console.log('Handling OPTIONS request');
-    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    res.sendStatus(200);
-});
-
-// CORS middleware for all other requests
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://shoes-fe-v3-frontend.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
+// Simple CORS middleware
+app.use(cors({
+    origin: true, // Allow all origins
+    credentials: true, // Allow credentials
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Request logging
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
-    console.log('Request headers:', req.headers);
     next();
 });
+
+// API Routes
+app.use('/api/v1', require('./routes/product'));
+app.use('/api/v1', require('./routes/admin'));
 
 // Routes
 app.get('/', (req, res) => {
