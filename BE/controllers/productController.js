@@ -1,10 +1,15 @@
 const Product = require('../models/Product');
+const path = require('path');
+const fs = require('fs');
 
 // Create new product => /api/v1/product/new
 exports.createProduct = async (req, res) => {
     try {
         // Log request body for debugging
-        console.log('Creating product with data:', req.body);
+        console.log('Creating product with data:', {
+            ...req.body,
+            image: req.body.image ? 'Image data exists' : 'No image'
+        });
 
         // Validate required fields
         const requiredFields = ['name', 'price', 'description', 'brand', 'category'];
@@ -27,6 +32,23 @@ exports.createProduct = async (req, res) => {
             });
         }
 
+        // Validate and process image
+        let imageUrl = null;
+        if (req.body.image) {
+            if (req.body.image.startsWith('data:image')) {
+                // Save base64 image
+                const base64Data = req.body.image.split(';base64,').pop();
+                const imageBuffer = Buffer.from(base64Data, 'base64');
+                const imageName = `product_${Date.now()}.jpg`;
+                const imagePath = path.join(__dirname, '../uploads', imageName);
+
+                await fs.promises.writeFile(imagePath, imageBuffer);
+                imageUrl = `/uploads/${imageName}`;
+            } else {
+                imageUrl = req.body.image;
+            }
+        }
+
         // Create product
         const product = await Product.create({
             name: req.body.name,
@@ -35,10 +57,10 @@ exports.createProduct = async (req, res) => {
             brand: req.body.brand,
             category: req.body.category,
             stock: req.body.stock || 1,
-            image: req.body.image || null
+            image: imageUrl
         });
 
-        console.log('Hello World - Product created successfully');
+        console.log('Product created successfully:', product._id);
         res.status(201).json({
             success: true,
             product
