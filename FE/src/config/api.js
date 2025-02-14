@@ -23,6 +23,12 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
     (config) => {
+        // Get token from localStorage
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
         // Log request
         console.log('API Request:', {
             url: config.url,
@@ -51,6 +57,13 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        // Handle 401 errors
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/admin/login';
+            return Promise.reject(new Error('Please login again'));
+        }
+
         // Log error details
         if (error.response) {
             // Server trả về response với status code nằm ngoài range 2xx

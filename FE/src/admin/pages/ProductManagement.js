@@ -85,21 +85,17 @@ const ProductManagement = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Kiểm tra kích thước file (giới hạn 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showNotification('Image size should be less than 5MB', 'error');
-                return;
-            }
-
-            // Kiểm tra loại file
-            if (!file.type.match('image.*')) {
-                showNotification('Please select an image file', 'error');
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                setError('Image size should be less than 5MB');
                 return;
             }
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
+                setFormData(prev => ({
+                    ...prev,
+                    image: reader.result
+                }));
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
@@ -109,20 +105,45 @@ const ProductManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            if (selectedProduct) {
-                const response = await axios.put(`${API_URL}/product/${selectedProduct._id}`, formData);
-                console.log('Update response:', response.data);
-                showNotification('Product updated successfully');
-            } else {
-                const response = await axios.post(`${API_URL}/product/new`, formData);
-                console.log('Create response:', response.data);
-                showNotification('Product added successfully');
+            // Validate form
+            if (!formData.name || !formData.price || !formData.description || !formData.brand || !formData.category) {
+                setError('Please fill in all required fields');
+                return;
             }
-            await fetchProducts();
-            resetForm();
+
+            // Convert price to number
+            const productData = {
+                ...formData,
+                price: Number(formData.price),
+                stock: Number(formData.stock) || 1
+            };
+
+            // Log form data before submission
+            console.log('Submitting product data:', productData);
+
+            const response = await axios.post(`${API_URL}/product/new`, productData);
+
+            if (response.data.success) {
+                setNotification({ show: true, message: 'Product created successfully', type: 'success' });
+                // Reset form
+                setFormData({
+                    name: '',
+                    price: '',
+                    description: '',
+                    brand: '',
+                    category: '',
+                    stock: '1',
+                    image: null
+                });
+                setImagePreview(null);
+                // Refresh product list
+                await fetchProducts();
+            } else {
+                setError(response.data.error || 'Failed to create product');
+            }
         } catch (err) {
             console.error('Error saving product:', err);
-            showNotification(err.response?.data?.message || 'Error saving product', 'error');
+            setError(err.response?.data?.error || err.message || 'Failed to create product');
         }
     };
 
