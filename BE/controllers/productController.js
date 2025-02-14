@@ -91,32 +91,28 @@ exports.createProduct = async (req, res) => {
 // Get all products => /api/v1/products
 exports.getProducts = async (req, res) => {
     try {
-        // Add timeout for database query with longer duration
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Database query timeout')), 30000)
-        );
+        const products = await Product.find().lean();
 
-        const queryPromise = Product.find().lean().exec();
+        // Process image URLs
+        const processedProducts = products.map(product => ({
+            ...product,
+            image: product.image
+                ? product.image.startsWith('data:image')
+                    ? product.image
+                    : `${process.env.API_BASE_URL}${product.image}`
+                : null
+        }));
 
-        // Race between query and timeout
-        const products = await Promise.race([queryPromise, timeoutPromise]);
-
-        console.log('Hello World - Products fetched successfully');
-        // Send response in chunks if data is large
         res.status(200).json({
             success: true,
             count: products.length,
-            products: products.map(product => ({
-                ...product,
-                image: product.image ? product.image.substring(0, 100) + '...' : null // Truncate base64 for response
-            }))
+            products: processedProducts
         });
     } catch (error) {
         console.error('Product fetch error:', error);
-        res.status(error.message === 'Database query timeout' ? 504 : 500).json({
+        res.status(500).json({
             success: false,
-            error: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            error: error.message
         });
     }
 };
@@ -124,17 +120,28 @@ exports.getProducts = async (req, res) => {
 // Get single product details => /api/v1/product/:id
 exports.getSingleProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id).lean();
+
         if (!product) {
             return res.status(404).json({
                 success: false,
                 message: 'Product not found'
             });
         }
-        console.log('Hello World - Single product fetched successfully');
+
+        // Process image URL
+        const processedProduct = {
+            ...product,
+            image: product.image
+                ? product.image.startsWith('data:image')
+                    ? product.image
+                    : `${process.env.API_BASE_URL}${product.image}`
+                : null
+        };
+
         res.status(200).json({
             success: true,
-            product
+            product: processedProduct
         });
     } catch (error) {
         console.error('Error fetching product:', error);
