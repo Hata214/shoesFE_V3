@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Constants
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://shoes-fe-v3-backend.vercel.app/api/v1';
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 // API endpoints
 export const endpoints = {
@@ -15,32 +15,36 @@ export const endpoints = {
 const api = axios.create({
     baseURL: BASE_URL,
     headers: {
-        'Content-Type': 'application/json'
-    },
-    withCredentials: true
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 });
 
 // Request interceptor
 api.interceptors.request.use(
     (config) => {
-        // Get token from localStorage
         const token = localStorage.getItem('adminToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
 
-        // Log request
+        // Debug logging
         console.log('API Request:', {
             url: config.url,
-            method: config.method,
-            data: config.data,
-            headers: config.headers,
-            baseURL: config.baseURL
+            baseURL: config.baseURL,
+            method: config.method
         });
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+            // Debug logging
+            console.log('Token found:', token.substring(0, 20) + '...');
+            console.log('Full headers:', config.headers);
+        } else {
+            console.log('No token found in localStorage');
+        }
+
         return config;
     },
     (error) => {
-        console.error('API Request Error:', error);
+        console.error('Request interceptor error:', error);
         return Promise.reject(error);
     }
 );
@@ -48,43 +52,32 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
     (response) => {
-        // Log response
         console.log('API Response:', {
             status: response.status,
-            data: response.data,
-            headers: response.headers
+            url: response.config.url
         });
         return response;
     },
     (error) => {
-        // Handle 401 errors
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem('adminToken');
-            window.location.href = '/admin/login';
-            return Promise.reject(new Error('Please login again'));
+        if (error.response) {
+            console.error('API Error Response:', {
+                status: error.response.status,
+                data: error.response.data,
+                headers: error.response.headers,
+                url: error.config.url
+            });
+
+            if (error.response.status === 401) {
+                console.log('Token expired or invalid - redirecting to login');
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin/login';
+            }
+        } else if (error.request) {
+            console.error('No response received:', error.request);
+        } else {
+            console.error('Error setting up request:', error.message);
         }
 
-        // Log error details
-        if (error.response) {
-            // Server trả về response với status code nằm ngoài range 2xx
-            console.error('API Response Error:', {
-                data: error.response.data,
-                status: error.response.status,
-                headers: error.response.headers
-            });
-        } else if (error.request) {
-            // Request đã được gửi nhưng không nhận được response
-            console.error('API Request Error:', {
-                request: error.request,
-                message: 'No response received'
-            });
-        } else {
-            // Có lỗi khi setting up request
-            console.error('API Error:', {
-                message: error.message,
-                config: error.config
-            });
-        }
         return Promise.reject(error);
     }
 );
