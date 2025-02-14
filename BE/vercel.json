@@ -11,21 +11,29 @@
             "src": "/uploads/(.*)",
             "dest": "/uploads/$1",
             "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
+                "Cache-Control": "public, max-age=31536000, immutable",
+                "Access-Control-Allow-Origin": "https://shoes-fe-v3-frontend.vercel.app",
+                "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "true"
             }
         },
         {
             "src": "/images/(.*)",
             "dest": "/images/$1",
             "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
+                "Cache-Control": "public, max-age=31536000, immutable",
+                "Access-Control-Allow-Origin": "https://shoes-fe-v3-frontend.vercel.app",
+                "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Credentials": "true"
             }
         },
         {
             "src": "/(.*)",
             "dest": "server.js",
             "headers": {
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": "https://shoes-fe-v3-frontend.vercel.app",
                 "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
                 "Access-Control-Allow-Credentials": "true"

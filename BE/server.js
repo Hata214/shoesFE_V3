@@ -17,17 +17,22 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Simple CORS middleware
-app.use(cors({
-    origin: true, // Allow all origins
-    credentials: true, // Allow credentials
+// CORS configuration
+const corsOptions = {
+    origin: 'https://shoes-fe-v3-frontend.vercel.app',
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Length', 'X-Powered-By']
+};
 
-// Request logging
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Request logging middleware
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+    console.log(`${req.method} ${req.path}`);
+    console.log('Headers:', req.headers);
     next();
 });
 
