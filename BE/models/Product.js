@@ -10,8 +10,8 @@ const productSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, 'Please enter product price'],
-        min: [1, 'Price cannot be less than 1'],
-        default: 1
+        maxLength: [5, 'Product price cannot exceed 5 characters'],
+        default: 0.0
     },
     description: {
         type: String,
@@ -39,12 +39,12 @@ const productSchema = new mongoose.Schema({
     stock: {
         type: Number,
         required: [true, 'Please enter product stock'],
-        min: [1, 'Stock cannot be less than 1'],
-        max: [999, 'Stock cannot exceed 999'],
+        maxLength: [3, 'Product stock cannot exceed 3 characters'],
         default: 1
     },
     image: {
-        type: String  // Để lưu trữ ảnh dạng Base64
+        type: String,
+        required: false
     },
     rating: {
         type: Number,

@@ -1,6 +1,4 @@
 const Product = require('../models/Product');
-const path = require('path');
-const fs = require('fs').promises;
 
 // Create new product => /api/v1/product/new
 exports.createProduct = async (req, res) => {
@@ -32,42 +30,7 @@ exports.createProduct = async (req, res) => {
             });
         }
 
-        // Process image
-        let imageUrl = null;
-        if (req.body.image) {
-            try {
-                if (req.body.image.startsWith('data:image')) {
-                    // Extract image data
-                    const base64Data = req.body.image.split(';base64,').pop();
-                    const imageBuffer = Buffer.from(base64Data, 'base64');
-                    const imageName = `product_${Date.now()}.jpg`;
-
-                    // Create uploads directory if it doesn't exist
-                    const uploadsDir = path.join(__dirname, '../uploads');
-                    try {
-                        await fs.access(uploadsDir);
-                    } catch (err) {
-                        await fs.mkdir(uploadsDir, { recursive: true });
-                    }
-
-                    // Save image
-                    const imagePath = path.join(uploadsDir, imageName);
-                    await fs.writeFile(imagePath, imageBuffer);
-                    imageUrl = `/uploads/${imageName}`;
-                    console.log('Image saved successfully:', imageUrl);
-                } else {
-                    imageUrl = req.body.image;
-                }
-            } catch (error) {
-                console.error('Error processing image:', error);
-                return res.status(400).json({
-                    success: false,
-                    error: 'Error processing image'
-                });
-            }
-        }
-
-        // Create product
+        // Create product with direct base64 image
         const product = await Product.create({
             name: req.body.name,
             price: req.body.price,
@@ -75,7 +38,7 @@ exports.createProduct = async (req, res) => {
             brand: req.body.brand,
             category: req.body.category,
             stock: req.body.stock || 1,
-            image: imageUrl
+            image: req.body.image || null
         });
 
         console.log('Product created successfully:', product._id);
@@ -109,22 +72,11 @@ exports.createProduct = async (req, res) => {
 // Get all products => /api/v1/products
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find().lean();
-
-        // Process image URLs
-        const processedProducts = products.map(product => ({
-            ...product,
-            image: product.image
-                ? product.image.startsWith('data:image')
-                    ? product.image
-                    : `${process.env.API_BASE_URL}${product.image}`
-                : null
-        }));
-
+        const products = await Product.find();
         res.status(200).json({
             success: true,
             count: products.length,
-            products: processedProducts
+            products
         });
     } catch (error) {
         console.error('Product fetch error:', error);
@@ -138,7 +90,7 @@ exports.getProducts = async (req, res) => {
 // Get single product details => /api/v1/product/:id
 exports.getSingleProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).lean();
+        const product = await Product.findById(req.params.id);
 
         if (!product) {
             return res.status(404).json({
@@ -147,19 +99,9 @@ exports.getSingleProduct = async (req, res) => {
             });
         }
 
-        // Process image URL
-        const processedProduct = {
-            ...product,
-            image: product.image
-                ? product.image.startsWith('data:image')
-                    ? product.image
-                    : `${process.env.API_BASE_URL}${product.image}`
-                : null
-        };
-
         res.status(200).json({
             success: true,
-            product: processedProduct
+            product
         });
     } catch (error) {
         console.error('Error fetching product:', error);
@@ -180,11 +122,12 @@ exports.updateProduct = async (req, res) => {
                 message: 'Product not found'
             });
         }
+
         product = await Product.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
         });
-        console.log('Hello World - Product updated successfully');
+
         res.status(200).json({
             success: true,
             product
@@ -208,8 +151,8 @@ exports.deleteProduct = async (req, res) => {
                 message: 'Product not found'
             });
         }
+
         await Product.findByIdAndDelete(req.params.id);
-        console.log('Hello World - Product deleted successfully');
         res.status(200).json({
             success: true,
             message: 'Product deleted successfully'
