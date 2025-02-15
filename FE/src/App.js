@@ -1,8 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-
-// Pages
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
@@ -19,63 +17,63 @@ import CheckoutFailed from './pages/CheckoutFailed';
 import SearchResults from './pages/SearchResults';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-import NotFound from './components/NotFound';
 
 // Admin imports
 import AdminLogin from './admin/pages/AdminLogin';
-import AdminDashboard from './admin/pages/AdminDashboard';
-import ProductManagement from './admin/pages/ProductManagement';
-
-// Auth Provider
-import { AuthProvider } from './contexts/AuthContext';
+import AdminLayout from './admin/components/AdminLayout';
 
 // Components
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
     return (
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<Layout><Home /></Layout>} />
-                    <Route path="/products" element={<Layout><Shop /></Layout>} />
-                    <Route path="/about" element={<Layout><About /></Layout>} />
-                    <Route path="/cart" element={<Layout><Cart /></Layout>} />
-                    <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
-                    <Route path="/wishlist" element={<Layout><Wishlist /></Layout>} />
-                    <Route path="/profile" element={<Layout><Profile /></Layout>} />
-                    <Route path="/help" element={<Layout><Help /></Layout>} />
-                    <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-                    <Route path="/checkout/success" element={<Layout><CheckoutSuccess /></Layout>} />
-                    <Route path="/checkout/failed" element={<Layout><CheckoutFailed /></Layout>} />
-                    <Route path="/search" element={<Layout><SearchResults /></Layout>} />
-                    <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
-                    <Route path="/terms" element={<Layout><Terms /></Layout>} />
-                    <Route path="/login" element={<Layout><Login /></Layout>} />
-                    <Route path="/register" element={<Layout><Register /></Layout>} />
+        <Router>
+            <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Shop />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/checkout/success" element={<CheckoutSuccess />} />
+                <Route path="/checkout/failed" element={<CheckoutFailed />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
 
-                    {/* Admin Routes */}
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route path="/admin/dashboard" element={
+                {/* Admin Routes */}
+                <Route
+                    path="/admin"
+                    element={<Navigate to="/admin/dashboard" replace />}
+                />
+                <Route
+                    path="/admin/dashboard"
+                    element={
                         <PrivateRoute>
-                            <AdminDashboard />
+                            <AdminLayout />
                         </PrivateRoute>
-                    } />
-                    <Route path="/admin/products" element={
+                    }
+                />
+                <Route
+                    path="/admin/products"
+                    element={
                         <PrivateRoute>
                             <ProductManagement />
                         </PrivateRoute>
-                    } />
+                    }
+                />
 
-                    {/* All other admin routes show 404 */}
-                    <Route path="/admin/*" element={<NotFound />} />
-
-                    {/* 404 Route */}
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </Router>
-        </AuthProvider>
+                {/* 404 Route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Router>
     );
 }
 
