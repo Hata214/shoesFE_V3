@@ -21,6 +21,7 @@ import Terms from './pages/Terms';
 // Admin imports
 import AdminLogin from './admin/pages/AdminLogin';
 import AdminLayout from './admin/components/AdminLayout';
+import ProductManagement from './admin/pages/ProductManagement';
 
 // Components
 import PrivateRoute from './components/PrivateRoute';
