@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 // Create new product => /api/v1/product/new
 exports.createProduct = async (req, res) => {
@@ -32,20 +32,38 @@ exports.createProduct = async (req, res) => {
             });
         }
 
-        // Validate and process image
+        // Process image
         let imageUrl = null;
         if (req.body.image) {
-            if (req.body.image.startsWith('data:image')) {
-                // Save base64 image
-                const base64Data = req.body.image.split(';base64,').pop();
-                const imageBuffer = Buffer.from(base64Data, 'base64');
-                const imageName = `product_${Date.now()}.jpg`;
-                const imagePath = path.join(__dirname, '../uploads', imageName);
+            try {
+                if (req.body.image.startsWith('data:image')) {
+                    // Extract image data
+                    const base64Data = req.body.image.split(';base64,').pop();
+                    const imageBuffer = Buffer.from(base64Data, 'base64');
+                    const imageName = `product_${Date.now()}.jpg`;
 
-                await fs.promises.writeFile(imagePath, imageBuffer);
-                imageUrl = `/uploads/${imageName}`;
-            } else {
-                imageUrl = req.body.image;
+                    // Create uploads directory if it doesn't exist
+                    const uploadsDir = path.join(__dirname, '../uploads');
+                    try {
+                        await fs.access(uploadsDir);
+                    } catch (err) {
+                        await fs.mkdir(uploadsDir, { recursive: true });
+                    }
+
+                    // Save image
+                    const imagePath = path.join(uploadsDir, imageName);
+                    await fs.writeFile(imagePath, imageBuffer);
+                    imageUrl = `/uploads/${imageName}`;
+                    console.log('Image saved successfully:', imageUrl);
+                } else {
+                    imageUrl = req.body.image;
+                }
+            } catch (error) {
+                console.error('Error processing image:', error);
+                return res.status(400).json({
+                    success: false,
+                    error: 'Error processing image'
+                });
             }
         }
 
