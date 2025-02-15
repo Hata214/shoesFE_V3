@@ -6,28 +6,15 @@ const AdminLogin = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { login, isAuthenticated } = useAuth();
-
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            const from = location.state?.from?.pathname || '/admin/dashboard';
-            navigate(from);
+            navigate('/admin/login');
         }
-    }, [isAuthenticated, navigate, location]);
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -36,19 +23,13 @@ const AdminLogin = () => {
 
         try {
             const result = await login(formData.email, formData.password);
-
-            if (result.success) {
-                const from = location.state?.from?.pathname || '/admin/dashboard';
-                navigate(from);
-            } else {
+            if (!result.success) {
                 setError(result.error);
             }
         } catch (err) {
             setError('An unexpected error occurred');
-            console.error('Login error:', err);
-        } finally {
-            setLoading(false);
         }
+        setLoading(false);
     };
 
     return (
@@ -62,7 +43,6 @@ const AdminLogin = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    {/* Back to Home */}
                     <div className="text-center mb-6">
                         <Link
                             to="/"
@@ -89,10 +69,9 @@ const AdminLogin = () => {
                                     id="email"
                                     name="email"
                                     type="email"
-                                    autoComplete="email"
                                     required
                                     value={formData.email}
-                                    onChange={handleChange}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                                     disabled={loading}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 />
@@ -108,10 +87,9 @@ const AdminLogin = () => {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    autoComplete="current-password"
                                     required
                                     value={formData.password}
-                                    onChange={handleChange}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                                     disabled={loading}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 />
@@ -122,9 +100,7 @@ const AdminLogin = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${loading
-                                        ? 'bg-indigo-400 cursor-not-allowed'
-                                        : 'bg-indigo-600 hover:bg-indigo-700'
+                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
                                     } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                             >
                                 {loading ? (
