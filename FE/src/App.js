@@ -21,8 +21,6 @@ import NotFound from './components/NotFound';
 
 // Admin imports
 import AdminLogin from './admin/pages/AdminLogin';
-import AdminDashboard from './admin/pages/AdminDashboard';
-import ProductManagement from './admin/pages/ProductManagement';
 
 // Components
 import PrivateRoute from './components/PrivateRoute';
@@ -51,19 +49,9 @@ function App() {
 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={
-                    <PrivateRoute>
-                        <AdminDashboard />
-                    </PrivateRoute>
-                } />
-                <Route path="/admin/products" element={
-                    <PrivateRoute>
-                        <ProductManagement />
-                    </PrivateRoute>
-                } />
 
-                {/* Handle /admin route with 404 */}
-                <Route path="/admin" element={<NotFound />} />
+                {/* All other admin routes show 404 */}
+                <Route path="/admin/*" element={<NotFound />} />
 
                 {/* 404 Route */}
                 <Route path="*" element={<NotFound />} />
