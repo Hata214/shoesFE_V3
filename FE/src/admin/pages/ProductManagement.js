@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import api, { API_URL } from '../../config/api';
+import api, { endpoints } from '../../config/api';
+import { useNavigate } from 'react-router-dom';
+import defaultProductImage from '../../assets/images/products/default-product.jpg';
 
 const ProductManagement = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,18 +27,30 @@ const ProductManagement = () => {
     });
 
     useEffect(() => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            navigate('/admin/login');
+            return;
+        }
         fetchProducts();
-    }, []);
+    }, [navigate]);
 
     const fetchProducts = async () => {
         try {
-            const response = await api.get('/products');
+            const response = await api.get(endpoints.products);
             console.log('Fetched products:', response.data);
-            setProducts(response.data.products);
-            setError(null);
+            if (response.data && Array.isArray(response.data.products)) {
+                setProducts(response.data.products);
+                setError(null);
+            } else {
+                setError('Invalid data format received from server');
+            }
         } catch (err) {
             console.error('Error fetching products:', err);
-            setError('Error fetching products: ' + err.message);
+            if (err.response?.status === 401) {
+                navigate('/admin/login');
+            }
+            setError('Error fetching products: ' + (err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
         }
@@ -120,7 +135,7 @@ const ProductManagement = () => {
             // Log form data before submission
             console.log('Submitting product data:', productData);
 
-            const response = await api.post('/product/new', productData);
+            const response = await api.post(endpoints.newProduct, productData);
 
             if (response.data.success) {
                 showNotification('Product created successfully');
@@ -149,7 +164,7 @@ const ProductManagement = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
-                const response = await api.delete(`/product/${id}`);
+                const response = await api.delete(`${endpoints.product}/${id}`);
                 console.log('Delete response:', response.data);
                 showNotification('Product deleted successfully');
                 fetchProducts();
@@ -193,6 +208,12 @@ const ProductManagement = () => {
             sortBy: field,
             sortOrder: prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc'
         }));
+    };
+
+    const getProductImageUrl = (imageUrl) => {
+        if (!imageUrl) return defaultProductImage;
+        if (imageUrl.startsWith('http')) return imageUrl;
+        return `${process.env.REACT_APP_ASSETS_URL}${imageUrl}`;
     };
 
     const filteredProducts = products
@@ -398,9 +419,13 @@ const ProductManagement = () => {
                             <tr key={product._id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <img
-                                        src={product.image || 'https://via.placeholder.com/50x50'}
+                                        src={getProductImageUrl(product.image)}
                                         alt={product.name}
                                         className="w-12 h-12 object-cover rounded"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = defaultProductImage;
+                                        }}
                                     />
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">{product.name}</td>
