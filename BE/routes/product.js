@@ -11,14 +11,13 @@ const {
     deleteProduct
 } = require('../controllers/productController');
 
-// Public routes
-router.route('/products').get(getProducts);
-router.route('/product/:id').get(getSingleProduct);
+// Public routes - No authentication required
+router.get('/products', getProducts);
+router.get('/product/:id', getSingleProduct);
 
-// Protected routes - require admin authentication
-router.route('/product/new').post(isAuthenticatedAdmin, processImage, createProduct);
-router.route('/product/:id')
-    .put(isAuthenticatedAdmin, processImage, updateProduct)
-    .delete(isAuthenticatedAdmin, deleteProduct);
+// Protected routes - Admin authentication required
+router.post('/product/new', isAuthenticatedAdmin, processImage, createProduct);
+router.put('/product/:id', isAuthenticatedAdmin, processImage, updateProduct);
+router.delete('/product/:id', isAuthenticatedAdmin, deleteProduct);
 
 module.exports = router; 
