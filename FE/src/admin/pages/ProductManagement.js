@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { API_URL } from '../../config/api';
+import api, { API_URL } from '../../config/api';
 
 const ProductManagement = () => {
     const [products, setProducts] = useState([]);
@@ -30,7 +29,7 @@ const ProductManagement = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get(`${API_URL}/products`);
+            const response = await api.get('/products');
             console.log('Fetched products:', response.data);
             setProducts(response.data.products);
             setError(null);
@@ -111,7 +110,7 @@ const ProductManagement = () => {
                 return;
             }
 
-            // Convert price to number
+            // Convert price and stock to numbers
             const productData = {
                 ...formData,
                 price: Number(formData.price),
@@ -121,19 +120,19 @@ const ProductManagement = () => {
             // Log form data before submission
             console.log('Submitting product data:', productData);
 
-            const response = await axios.post(`${API_URL}/product/new`, productData);
+            const response = await api.post('/product/new', productData);
 
             if (response.data.success) {
-                setNotification({ show: true, message: 'Product created successfully', type: 'success' });
+                showNotification('Product created successfully');
                 // Reset form
                 setFormData({
                     name: '',
                     price: '',
                     description: '',
                     brand: '',
-                    category: '',
+                    category: 'Running',
                     stock: '1',
-                    image: null
+                    image: ''
                 });
                 setImagePreview(null);
                 // Refresh product list
@@ -143,14 +142,14 @@ const ProductManagement = () => {
             }
         } catch (err) {
             console.error('Error saving product:', err);
-            setError(err.response?.data?.error || err.message || 'Failed to create product');
+            setError(err.response?.data?.message || 'Failed to create product');
         }
     };
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
-                const response = await axios.delete(`${API_URL}/product/${id}`);
+                const response = await api.delete(`/product/${id}`);
                 console.log('Delete response:', response.data);
                 showNotification('Product deleted successfully');
                 fetchProducts();
