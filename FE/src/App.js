@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+
+// Pages
 import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
@@ -21,6 +23,8 @@ import NotFound from './components/NotFound';
 
 // Admin imports
 import AdminLogin from './admin/pages/AdminLogin';
+import AdminDashboard from './admin/pages/AdminDashboard';
+import ProductManagement from './admin/pages/ProductManagement';
 
 // Auth Provider
 import { AuthProvider } from './contexts/AuthContext';
@@ -53,6 +57,16 @@ function App() {
 
                     {/* Admin Routes */}
                     <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/dashboard" element={
+                        <PrivateRoute>
+                            <AdminDashboard />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/admin/products" element={
+                        <PrivateRoute>
+                            <ProductManagement />
+                        </PrivateRoute>
+                    } />
 
                     {/* All other admin routes show 404 */}
                     <Route path="/admin/*" element={<NotFound />} />

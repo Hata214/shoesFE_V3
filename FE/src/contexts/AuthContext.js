@@ -5,18 +5,25 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Kiểm tra token và lấy thông tin user khi component mount
     useEffect(() => {
         const initializeAuth = async () => {
             const token = localStorage.getItem('adminToken');
             if (token) {
                 try {
                     const response = await api.get('/admin/me');
-                    setIsAuthenticated(response.data.success);
+                    if (response.data.success) {
+                        setUser(response.data.admin);
+                        setIsAuthenticated(true);
+                    } else {
+                        handleLogout();
+                    }
                 } catch (error) {
-                    localStorage.removeItem('adminToken');
-                    setIsAuthenticated(false);
+                    console.error('Auth initialization error:', error);
+                    handleLogout();
                 }
             }
             setLoading(false);
@@ -25,19 +32,29 @@ export const AuthProvider = ({ children }) => {
         initializeAuth();
     }, []);
 
-    const login = async (email, password) => {
+    const handleLogin = async (email, password) => {
         try {
             const response = await api.post('/admin/login', { email, password });
+
             if (response.data.success) {
-                localStorage.setItem('adminToken', response.data.token);
+                const { token, admin } = response.data;
+
+                // Lưu token vào localStorage
+                localStorage.setItem('adminToken', token);
+
+                // Cập nhật state
+                setUser(admin);
                 setIsAuthenticated(true);
+
                 return { success: true };
             }
+
             return {
                 success: false,
                 error: response.data.message || 'Login failed'
             };
         } catch (error) {
+            console.error('Login error:', error);
             return {
                 success: false,
                 error: error.response?.data?.message || 'Login failed'
@@ -45,13 +62,37 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
+    const handleLogout = () => {
+        // Xóa token từ localStorage
         localStorage.removeItem('adminToken');
+
+        // Reset state
+        setUser(null);
         setIsAuthenticated(false);
     };
 
+    const checkAuthStatus = async () => {
+        try {
+            const response = await api.get('/admin/me');
+            return response.data.success;
+        } catch (error) {
+            console.error('Auth check failed:', error);
+            handleLogout();
+            return false;
+        }
+    };
+
+    const value = {
+        isAuthenticated,
+        user,
+        loading,
+        login: handleLogin,
+        logout: handleLogout,
+        checkAuthStatus
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+        <AuthContext.Provider value={value}>
             {!loading && children}
         </AuthContext.Provider>
     );
