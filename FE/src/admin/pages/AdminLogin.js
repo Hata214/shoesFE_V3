@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import api, { endpoints } from '../../config/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AdminLogin = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { login, isAuthenticated } = useAuth();
+
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // Check if user is already logged in
+    // Redirect if already authenticated
     useEffect(() => {
-        const token = localStorage.getItem('adminToken');
-        if (token) {
-            navigate('/admin/dashboard');
+        if (isAuthenticated) {
+            const from = location.state?.from?.pathname || '/admin/dashboard';
+            navigate(from);
         }
-    }, [navigate]);
+    }, [isAuthenticated, navigate, location]);
 
     const handleChange = (e) => {
         setFormData({
@@ -28,19 +31,23 @@ const AdminLogin = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+
         try {
-            const response = await api.post(endpoints.adminLogin, formData);
-            if (response.data.success) {
-                localStorage.setItem('adminToken', response.data.token);
-                // Redirect to the page user tried to access or dashboard
+            const result = await login(formData.email, formData.password);
+
+            if (result.success) {
                 const from = location.state?.from?.pathname || '/admin/dashboard';
                 navigate(from);
             } else {
-                setError(response.data.message || 'Login failed');
+                setError(result.error);
             }
         } catch (err) {
+            setError('An unexpected error occurred');
             console.error('Login error:', err);
-            setError(err.response?.data?.message || 'Invalid admin credentials');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -86,6 +93,7 @@ const AdminLogin = () => {
                                     required
                                     value={formData.email}
                                     onChange={handleChange}
+                                    disabled={loading}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
@@ -104,6 +112,7 @@ const AdminLogin = () => {
                                     required
                                     value={formData.password}
                                     onChange={handleChange}
+                                    disabled={loading}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
@@ -112,9 +121,20 @@ const AdminLogin = () => {
                         <div>
                             <button
                                 type="submit"
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                disabled={loading}
+                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${loading
+                                        ? 'bg-indigo-400 cursor-not-allowed'
+                                        : 'bg-indigo-600 hover:bg-indigo-700'
+                                    } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                             >
-                                Sign in as Admin
+                                {loading ? (
+                                    <div className="flex items-center">
+                                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                        Signing in...
+                                    </div>
+                                ) : (
+                                    'Sign in as Admin'
+                                )}
                             </button>
                         </div>
                     </form>
