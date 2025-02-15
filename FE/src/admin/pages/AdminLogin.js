@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api, { endpoints } from '../../config/api';
 
 const AdminLogin = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
     const [error, setError] = useState('');
-
-    // Check if user is already logged in
-    useEffect(() => {
-        const token = localStorage.getItem('adminToken');
-        if (token) {
-            navigate('/admin/dashboard');
-        }
-    }, [navigate]);
 
     const handleChange = (e) => {
         setFormData({
@@ -32,9 +23,7 @@ const AdminLogin = () => {
             const response = await api.post(endpoints.adminLogin, formData);
             if (response.data.success) {
                 localStorage.setItem('adminToken', response.data.token);
-                // Redirect to the page user tried to access or dashboard
-                const from = location.state?.from?.pathname || '/admin/dashboard';
-                navigate(from);
+                navigate('/admin/dashboard');
             } else {
                 setError(response.data.message || 'Login failed');
             }
@@ -55,14 +44,14 @@ const AdminLogin = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    {/* Back to Home */}
+                    {/* Back to Regular Login */}
                     <div className="text-center mb-6">
                         <Link
-                            to="/"
+                            to="/login"
                             className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center"
                         >
                             <i className="fas fa-arrow-left mr-2"></i>
-                            Back to Home
+                            Back to Customer Login
                         </Link>
                     </div>
 

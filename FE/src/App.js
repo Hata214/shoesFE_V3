@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
@@ -21,58 +21,36 @@ import Terms from './pages/Terms';
 // Admin imports
 import AdminLogin from './admin/pages/AdminLogin';
 import AdminLayout from './admin/components/AdminLayout';
-import ProductManagement from './admin/pages/ProductManagement';
-
-// Components
-import PrivateRoute from './components/PrivateRoute';
 
 function App() {
     return (
         <Router>
             <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Shop />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/checkout/success" element={<CheckoutSuccess />} />
-                <Route path="/checkout/failed" element={<CheckoutFailed />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
 
                 {/* Admin Routes */}
-                <Route
-                    path="/admin"
-                    element={<Navigate to="/admin/dashboard" replace />}
-                />
-                <Route
-                    path="/admin/dashboard"
-                    element={
-                        <PrivateRoute>
-                            <AdminLayout />
-                        </PrivateRoute>
-                    }
-                />
-                <Route
-                    path="/admin/products"
-                    element={
-                        <PrivateRoute>
-                            <ProductManagement />
-                        </PrivateRoute>
-                    }
-                />
+                <Route path="/admin/*" element={<AdminLayout />} />
 
-                {/* 404 Route */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Customer Routes */}
+                <Route element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="shop" element={<Shop />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="product/:id" element={<ProductDetail />} />
+                    <Route path="wishlist" element={<Wishlist />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="help" element={<Help />} />
+                    <Route path="checkout" element={<Checkout />} />
+                    <Route path="checkout/success" element={<CheckoutSuccess />} />
+                    <Route path="checkout/failed" element={<CheckoutFailed />} />
+                    <Route path="search" element={<SearchResults />} />
+                    <Route path="privacy" element={<Privacy />} />
+                    <Route path="terms" element={<Terms />} />
+                </Route>
             </Routes>
         </Router>
     );
